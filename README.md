@@ -1,1 +1,3 @@
 # SeniorSeminar
+<br>
+The initial approach for this project, at least the session-scheduling aspect, is based on overlap. We calculate the overlap of any two of the 18 sesions in an ArrayList for lookup using the # of students in both and the average priority of that session in students' choices. We fill in the first two sessions in the top row based on the lowest overlap score. If any sessions require two instead of one due to anticipated popularity, that session will be the first one in the next row. Still in the top row, we calculate the sesion that overlaps the least with the two already in the top row, and repeat until the row is filled. The next row repeats this process, tarting with any alread-filled-in sessions in that row.
