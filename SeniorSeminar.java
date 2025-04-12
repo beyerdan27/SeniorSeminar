@@ -28,7 +28,7 @@ public class SeniorSeminar{
 				String[] tempList = new String[6];
 				tempList = tempData.split(",");
 				Student tempStudent = new Student(tempList[0], Integer.parseInt(tempList[1]), Integer.parseInt(tempList[2]), Integer.parseInt(tempList[3]), Integer.parseInt(tempList[4]), Integer.parseInt(tempList[5]));
-				tempStudent.toStringA();
+				studentList.add(tempStudent);
 			}
 			reader1.close();
 			Scanner reader2 = new Scanner(presenterFile);
@@ -37,7 +37,7 @@ public class SeniorSeminar{
 				String[] tempList = new String[3];
 				tempList = tempData.split(",");
 				Presenter tempPresenter = new Presenter(tempList[1], tempList[0], tempList[2]);
-				tempPresenter.toStringA();
+				presenterList.add(tempPresenter);
 			}
 			reader2.close();
 		}
@@ -45,6 +45,12 @@ public class SeniorSeminar{
 			System.out.println("Error: invalid file path");
 			e.printStackTrace();
 		}
+		/*for(Student s:studentList){
+			s.toStringA();
+		}
+		for(Presenter p:presenterList){
+			p.toStringA();
+		}*/
 	}
 	public boolean getYN(){return false;}//this will be for later when dealing with user input flow/control to get a simple yes/no answer
 }
