@@ -7,9 +7,11 @@ public class SeniorSeminar{
 	Scanner univScan;
 	ArrayList<ArrayList<Session>> sessionList;
 	ArrayList<Student> studentList;
+	ArrayList<Presenter> presenterList;
 	public SeniorSeminar(int numTimeSlots, int numClassrooms, int maxInClass){
 		sessionList = new ArrayList<ArrayList<Session>>();
 		studentList = new ArrayList<Student>();
+		presenterList = new ArrayList<Presenter>();
 		univScan = new Scanner(System.in);
 		this.numTimeSlots = numTimeSlots;
 		this.numClassrooms = numClassrooms;
@@ -17,17 +19,27 @@ public class SeniorSeminar{
 		//code to fill in the session arraylist<arraylist<>>
 	}
 	public void aggregateData(){
-		try{
+		try{ //student data
 			File studentFile = new File("SrSeminar_RawData.csv");
 			File presenterFile = new File("SrSeminar_RawData2.csv");
 			Scanner reader1 = new Scanner(studentFile);
 			while(reader1.hasNextLine()){
 				String tempData = reader1.nextLine();
 				String[] tempList = new String[6];
-				tempList = tempData.split(",");//THIS DOESNT WORK
+				tempList = tempData.split(",");
 				Student tempStudent = new Student(tempList[0], Integer.parseInt(tempList[1]), Integer.parseInt(tempList[2]), Integer.parseInt(tempList[3]), Integer.parseInt(tempList[4]), Integer.parseInt(tempList[5]));
 				tempStudent.toStringA();
 			}
+			reader1.close();
+			Scanner reader2 = new Scanner(presenterFile);
+			while(reader2.hasNextLine()){
+				String tempData = reader2.nextLine();
+				String[] tempList = new String[3];
+				tempList = tempData.split(",");
+				Presenter tempPresenter = new Presenter(tempList[1], tempList[0], tempList[2]);
+				tempPresenter.toStringA();
+			}
+			reader2.close();
 		}
 		catch(FileNotFoundException e){
 			System.out.println("Error: invalid file path");
