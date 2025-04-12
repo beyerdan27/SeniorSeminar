@@ -23,9 +23,9 @@ public class SeniorSeminar{
 			Scanner reader1 = new Scanner(studentFile);
 			while(reader1.hasNextLine()){
 				String tempData = reader1.nextLine();
-				ArrayList<String> tempList = new ArrayList<String>();
+				String[] tempList = new String[6];
 				tempList = tempData.split(",");//THIS DOESNT WORK
-				Student tempStudent = new Student(tempList.get(0), tempList.get(1).parseInt(), tempList.get(2).parseInt(), tempList.get(3).parseInt(), tempList.get(4).parseInt(), tempList.get(5).parseInt());
+				Student tempStudent = new Student(tempList[0], Integer.parseInt(tempList[1]), Integer.parseInt(tempList[2]), Integer.parseInt(tempList[3]), Integer.parseInt(tempList[4]), Integer.parseInt(tempList[5]));
 				tempStudent.toStringA();
 			}
 		}
