@@ -3,8 +3,10 @@ public class Student{
 	ArrayList<Integer> choices;
 	String name;
 	boolean hasChosen;
-	public Student(String name, int choice1, int choice2, int choice3, int choice4, int choice5){
+	int id;
+	public Student(int id, String name, int choice1, int choice2, int choice3, int choice4, int choice5){
 		choices = new ArrayList<Integer>();
+		this.id = id;
 		this.name = name;
 		if(choice1==choice2 && choice2==choice3 && choice3==choice4 && choice4==choice5 && choice5==0){
 			hasChosen = false;
@@ -18,10 +20,11 @@ public class Student{
 		choices.add(choice5);
 	}
 	public void toStringA(){
-		System.out.println(hasChosen + " " + name + " " + choices.get(0) + " " + choices.get(1) + " " + choices.get(2) + " " + choices.get(3) + " " + choices.get(4));
+		System.out.println(id+" "+hasChosen + " " + name + " " + choices.get(0) + " " + choices.get(1) + " " + choices.get(2) + " " + choices.get(3) + " " + choices.get(4));
 	}
 	public int getch(int num){
 		return choices.get(num-1);
 	}
+	public int getid(){return id;}
 
 }
