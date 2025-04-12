@@ -8,15 +8,26 @@ public class SeniorSeminar{
 	ArrayList<ArrayList<Session>> sessionList;
 	ArrayList<Student> studentList;
 	ArrayList<Presenter> presenterList;
+	ArrayList<Integer> popularityBySession; //does not have weighting for 1-5 on choice list as of now
+	int numSessions, numStudents;
+	
 	public SeniorSeminar(int numTimeSlots, int numClassrooms, int maxInClass){
 		sessionList = new ArrayList<ArrayList<Session>>();
 		studentList = new ArrayList<Student>();
 		presenterList = new ArrayList<Presenter>();
+		popularityBySession = new ArrayList<Integer>();
 		univScan = new Scanner(System.in);
 		this.numTimeSlots = numTimeSlots;
 		this.numClassrooms = numClassrooms;
 		this.maxInClass = maxInClass;
-		//code to fill in the session arraylist<arraylist<>>
+		for(int i=0;i<numTimeSlots; i++){
+			ArrayList<Session> tempSessionRow = new ArrayList<Session>();
+			for(int j=0; j<numClassrooms; j++){
+				Session tempSession = new Session();
+				tempSessionRow.add(tempSession);
+			}
+			sessionList.add(tempSessionRow);
+		}
 	}
 	public void aggregateData(){
 		try{ //student data
@@ -51,6 +62,24 @@ public class SeniorSeminar{
 		for(Presenter p:presenterList){
 			p.toStringA();
 		}*/
+		//tallying popularity
+		numSessions = presenterList.size();
+		numStudents = studentList.size();
+		for(int i=1; i<=numSessions; i++){
+			int tempct=0;
+			for(int j=0; j<numStudents; j++){
+				for(int k=1; k<6; k++){
+					if((studentList.get(j)).getch(k)==i) tempct++;
+				}
+			}
+			popularityBySession.add(tempct);
+		}
+		/*for(int i:popularityBySession){
+			System.out.println(i);
+		}*/
+		//System.out.println("sessions" + numSessions);
+		//System.out.println("students" + numStudents);
+		//System.out.println("pop"+popularityBySession.size());
 	}
 	public boolean getYN(){return false;}//this will be for later when dealing with user input flow/control to get a simple yes/no answer
 }

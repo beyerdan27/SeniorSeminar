@@ -20,5 +20,8 @@ public class Student{
 	public void toStringA(){
 		System.out.println(hasChosen + " " + name + " " + choices.get(0) + " " + choices.get(1) + " " + choices.get(2) + " " + choices.get(3) + " " + choices.get(4));
 	}
-	
+	public int getch(int num){
+		return choices.get(num-1);
+	}
+
 }
