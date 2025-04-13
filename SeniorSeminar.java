@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 public class SeniorSeminar{
 	int numTimeSlots, numClassrooms, maxInClass;
 	Scanner univScan;
@@ -12,8 +13,12 @@ public class SeniorSeminar{
 	ArrayList<ArrayList<Integer>> overlapTable;
 	ArrayList<Integer> numScheduledPerSession;
 	int numSessions, numStudents;
+	int numDoublesScheduled;
+	int numDoublesAllowed;
+	ArrayList<Integer> idsOfPermissableDoubles;
 	
 	public SeniorSeminar(int numTimeSlots, int numClassrooms, int maxInClass){
+		idsOfPermissableDoubles = new ArrayList<Integer>();
 		numScheduledPerSession = new ArrayList<Integer>();
 		sessionList = new ArrayList<ArrayList<Session>>();
 		studentList = new ArrayList<Student>();
@@ -26,10 +31,10 @@ public class SeniorSeminar{
 		this.maxInClass = maxInClass;
 		for(int i=0;i<numTimeSlots; i++){
 			ArrayList<Session> tempSessionRow = new ArrayList<Session>();
-			for(int j=0; j<numClassrooms; j++){
+			/*for(int j=0; j<numClassrooms; j++){
 				Session tempSession = new Session();
 				tempSessionRow.add(tempSession);
-			}
+			}*/
 			sessionList.add(tempSessionRow);
 		}
 	}
@@ -86,7 +91,18 @@ public class SeniorSeminar{
 		//System.out.println("sessions" + numSessions);
 		//System.out.println("students" + numStudents);
 		//System.out.println("pop"+popularityBySession.size());
-		
+
+		//calculating permissable doubles, used later in cnbstf
+		numDoublesScheduled=0;
+		numDoublesAllowed = (numTimeSlots * numClassrooms) - numSessions;
+		ArrayList<Integer> tempPop = new ArrayList<Integer>(popularityBySession);
+		for(int i=0; i<numDoublesAllowed; i++){
+			int tempMax = tempPop.indexOf(Collections.max(tempPop));
+			idsOfPermissableDoubles.add(tempMax+1);
+			tempPop.set(tempMax, -1);
+		}
+		//System.out.println(idsOfPermissableDoubles);
+		//System.out.println(popularityBySession);
 		//calculating overlap matrix
 		for(int i=1; i<=numSessions; i++){
 			ArrayList<Integer> tempList = new ArrayList<Integer>();
@@ -117,16 +133,41 @@ public class SeniorSeminar{
 		}*/
 	}
 	public void fillTimeSlots(){
-		sessionList.get(0).set(0, new Session(11, 1));
-		sessionList.get(0).set(1, new Session(14, 1));
-		sessionList.get(0).set(2, new Session(5, 1));
-		System.out.println(calculateNextBestSessionToFill(0,3));
+		//sessionList.get(0).add(new Session(11, 1));
+		//sessionList.get(0).add(new Session(14, 1));
+		//sessionList.get(0).add(new Session(5, 1));
+		//System.out.println(calculateNextBestSessionToFill(0,3));
+
+		//The following is a top-down prioritized top-left to bottom-right approach to this optimization
+		for(int col=0; col<numClassrooms; col++){
+			for(int row=0; row<numTimeSlots; row++){
+				if(col!=sessionList.get(row).size()-1) col = sessionList.get(row).size();
+				ArrayList<Integer> tempToBeInserted = new ArrayList<Integer>();
+				tempToBeInserted = calculateNextBestSessionToFill(row, col);
+				if(tempToBeInserted.size()>1){
+					sessionList.get(row).add(new Session(tempToBeInserted.get(0), numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1, row+1, col+1));
+					sessionList.get(row).add(new Session(tempToBeInserted.get(1), numScheduledPerSession.get(tempToBeInserted.get(1)-1)+1, row+1, col+2));
+					numScheduledPerSession.set(tempToBeInserted.get(0)-1, numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1);
+					numScheduledPerSession.set(tempToBeInserted.get(1)-1, numScheduledPerSession.get(tempToBeInserted.get(1)-1)+1);
+					continue;
+				}
+				sessionList.get(row).add(new Session(tempToBeInserted.get(0), numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1, row+1, col+1));
+				numScheduledPerSession.set(tempToBeInserted.get(0)-1, numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1);
+			}
+		}
+
+		for(int a=0; a<5; a++){
+			System.out.println();
+			for(int b=0; b<5; b++){
+				System.out.print(sessionList.get(a).get(b).getid()+" ");
+			}
+		}
+
 	}
 	public ArrayList<Integer> calculateNextBestSessionToFill(int currentRow, int currentIndex){ //1-indexed
 		for(int i=0; i<numSessions; i++){
 			numScheduledPerSession.add(0);
 		}//filling nsps with 0s to help with the following block of code
-		int numOfSessionsToCheckAgainst = currentIndex;
 		if(currentIndex==0){
 			int tempMinRow=-1;
 			int tempMinCol=-1;
@@ -134,12 +175,18 @@ public class SeniorSeminar{
 			for(int b=1; b<=numSessions; b++){
 				for(int c=1; c<=numSessions; c++){
 					if((tempMinScore==-1||overlapScore(b, c)<tempMinScore)||(overlapScore(b, c)==tempMinScore && (popularityBySession.get(b-1)+popularityBySession.get(c-1))>(popularityBySession.get(tempMinCol-1)+popularityBySession.get(tempMinRow-1)))){
-						tempMinScore = overlapScore(b, c);
-						tempMinRow = b;
-						tempMinCol = c;
+						if(numScheduledPerSession.get(b-1)<2&&numScheduledPerSession.get(c-1)<2){
+							if((numScheduledPerSession.get(b-1)>0&&idsOfPermissableDoubles.indexOf(b)==-1)||(numScheduledPerSession.get(c-1)>0&&idsOfPermissableDoubles.indexOf(c)==-1)){
+								//do nothing
+							} else {
+								tempMinScore = overlapScore(b, c);
+								tempMinRow = b;
+								tempMinCol = c;
+							}
+						}
 					}
 				}
-			}
+			} //1st case return below
 			ArrayList<Integer> tempListToReturn = new ArrayList<Integer>();
 			tempListToReturn.add(tempMinRow);
 			tempListToReturn.add(tempMinCol);
@@ -154,8 +201,12 @@ public class SeniorSeminar{
 						tempCurrentScoreSum += overlapScore(i, sessionList.get(currentRow).get(a).getid()); //stop this madness
 					}
 					if(minScoreSession==-1||(tempCurrentScoreSum<minTotalScore||(tempCurrentScoreSum==minTotalScore&&popularityBySession.get(i-1)>popularityBySession.get(minScoreSession-1)))) {
+						if(numScheduledPerSession.get(i-1)>0&&idsOfPermissableDoubles.indexOf(i)==-1) {
+							//do nothing
+						} else {
 						minScoreSession = i;
 						minTotalScore = tempCurrentScoreSum;
+						}
 					}
 				}
 			} //below we have a best session
