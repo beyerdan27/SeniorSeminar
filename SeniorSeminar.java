@@ -117,9 +117,10 @@ public class SeniorSeminar{
 		}*/
 	}
 	public void fillTimeSlots(){
-		sessionList.get(0).add(new Session(4, 1));
-		sessionList.get(0).add(new Session(6, 1));
-		System.out.println(calculateNextBestSessionToFill(0,2));
+		sessionList.get(0).set(0, new Session(11, 1));
+		sessionList.get(0).set(1, new Session(14, 1));
+		sessionList.get(0).set(2, new Session(5, 1));
+		System.out.println(calculateNextBestSessionToFill(0,3));
 	}
 	public ArrayList<Integer> calculateNextBestSessionToFill(int currentRow, int currentIndex){ //1-indexed
 		for(int i=0; i<numSessions; i++){
@@ -150,7 +151,7 @@ public class SeniorSeminar{
 				if(!existsInRow(currentRow, i)&&numScheduledPerSession.get(i-1)<2){ //don't schedule twice per row or more than 2 in total
 					int tempCurrentScoreSum=0;
 					for(int a=0; a<currentIndex; a++){//checking against every so far filled in 
-						tempCurrentScoreSum += overlapScore(i, sessionList.get(currentRow).get(0).getid()); //stop this madness
+						tempCurrentScoreSum += overlapScore(i, sessionList.get(currentRow).get(a).getid()); //stop this madness
 					}
 					if(minScoreSession==-1||(tempCurrentScoreSum<minTotalScore||(tempCurrentScoreSum==minTotalScore&&popularityBySession.get(i-1)>popularityBySession.get(minScoreSession-1)))) {
 						minScoreSession = i;
@@ -165,7 +166,7 @@ public class SeniorSeminar{
 	}
 	
 	public int overlapScore(int sessiona, int sessionb){ //yet another helper function, calculates overlap using the overlap lookup table
-		return overlapTable.get(sessiona).get(sessionb);
+		return overlapTable.get(sessiona-1).get(sessionb-1);
 	}
 	public boolean existsInRow(int row, int session){ //1-indexed
 		for(Session s:sessionList.get(row)){
