@@ -10,9 +10,11 @@ public class SeniorSeminar{
 	ArrayList<Presenter> presenterList;
 	ArrayList<Integer> popularityBySession; //does not have weighting for 1-5 on choice list as of now
 	ArrayList<ArrayList<Integer>> overlapTable;
+	ArrayList<Integer> numScheduledPerSession;
 	int numSessions, numStudents;
 	
 	public SeniorSeminar(int numTimeSlots, int numClassrooms, int maxInClass){
+		numScheduledPerSession = new ArrayList<Integer>();
 		sessionList = new ArrayList<ArrayList<Session>>();
 		studentList = new ArrayList<Student>();
 		presenterList = new ArrayList<Presenter>();
@@ -107,12 +109,60 @@ public class SeniorSeminar{
 			}
 			overlapTable.add(tempList);
 		}
-		for(int a=0; a<18; a++){
+		/*for(int a=0; a<18; a++){
 			System.out.println();
 			for(int b=0; b<18; b++){
 				System.out.print(" " + overlapTable.get(a).get(b));
 			}
+		}*/
+	}
+	public void fillTimeSlots(){
+
+	}
+	public ArrayList<Integer> calculateNextBestSessionToFill(int currentRow, int currentIndex){ //1-indexed
+		for(int i=0; i<numSessions; i++){
+			numScheduledPerSession.add(0);
+		}//filling nsps with 0s to help with the following block of code
+		int numOfSessionsToCheckAgainst = currentIndex;
+		int minScoreSession=-1;
+		if(currentIndex==0){
+			int tempMinRow=-1;
+			int tempMinCol=-1;
+			int tempMinScore=-1;
+			for(int b=1; b<=numSessions; b++){
+				for(int c=1; c<=numSessions; c++){
+					if((tempMinScore==-1||overlapScore(b, c)<tempMinScore)||(overlapScore(b, c)==tempMinScore && (popularityBySession.get(b)+popularityBySession.get(c))>(popularityBySession.get(tempMinCol)+popularityBySession.get(tempMinRow)))){
+						tempMinScore = overlapScore(b, c);
+						tempMinRow = b;
+						tempMinCol = c;
+					}
+				}
+			}
+			ArrayList<Integer> tempListToReturn = new ArrayList<Integer>();
+			tempListToReturn.add(tempMinRow);
+			tempListToReturn.add(tempMinCol);
+			return tempListToReturn;
+		} else {
+		for(int i=1; i<=numSessions; i++){
+			if(!existsInRow(currentRow, i)&&numScheduledPerSession.get(i-1)<2){ //don't schedule twice per row or more than 2 in total
+				int tempCurrentScoreSum=0;
+					for(int a=0; a<currentIndex; a++){//checking against every so far filled in 
+						tempCurrentScoreSum += overlapScore(i, sessionList.get(currentRow).get(0).getid()); //stop this madness
+					}
+					
+				}
+			}
 		}
+	}
+	
+	public int overlapScore(int sessiona, int sessionb){ //yet another helper function, calculates overlap using the overlap lookup table
+		return overlapTable.get(sessiona-1).get(sessionb-1);
+	}
+	public boolean existsInRow(int row, int session){ //1-indexed
+		for(Session s:sessionList.get(row-1)){
+			if(s.getid()==session) return true;
+		}
+		return false;
 	}
 	public boolean getYN(){return false;}//this will be for later when dealing with user input flow/control to get a simple yes/no answer
 }

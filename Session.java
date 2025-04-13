@@ -23,8 +23,8 @@ public class Session{
 		//code to figur eout amnd assign presenter id soon
 		//presenterID=-1;
 	}
-	public void setID(int sessionID){this.sessionID=sessionID;}		
-	public int getID(){return sessionID;}
+	public void setid(int sessionID){this.sessionID=sessionID;}		
+	public int getid(){return sessionID;}
 	public void setSpecIndex(int specIndex){this.specIndex=specIndex;}
 	public int getSpecIndex(){return specIndex;}
 	public void setTimeSlot(int timeSlot){this.timeSlot=timeSlot;}
