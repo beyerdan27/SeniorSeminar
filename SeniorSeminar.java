@@ -101,7 +101,7 @@ public class SeniorSeminar{
 			idsOfPermissableDoubles.add(tempMax+1);
 			tempPop.set(tempMax, -1);
 		}
-		//System.out.println(idsOfPermissableDoubles);
+		System.out.println(idsOfPermissableDoubles);
 		//System.out.println(popularityBySession);
 		//calculating overlap matrix
 		for(int i=1; i<=numSessions; i++){
@@ -151,8 +151,13 @@ public class SeniorSeminar{
 					numScheduledPerSession.set(tempToBeInserted.get(1)-1, numScheduledPerSession.get(tempToBeInserted.get(1)-1)+1);
 					continue;
 				}
+				if(tempToBeInserted.get(0)>=0){
 				sessionList.get(row).add(new Session(tempToBeInserted.get(0), numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1, row+1, col+1));
 				numScheduledPerSession.set(tempToBeInserted.get(0)-1, numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1);
+				} else{
+					sessionList.get(row).add(new Session(tempToBeInserted.get(0), 99, row+1, col+1));
+					//numScheduledPerSession.set(tempToBeInserted.get(0)-1, numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1);
+				}
 			}
 		}
 
@@ -198,14 +203,14 @@ public class SeniorSeminar{
 				if(!existsInRow(currentRow, i)&&numScheduledPerSession.get(i-1)<2){ //don't schedule twice per row or more than 2 in total
 					int tempCurrentScoreSum=0;
 					for(int a=0; a<currentIndex; a++){//checking against every so far filled in 
+						if(sessionList.get(currentRow).get(a).getid()>=0){
 						tempCurrentScoreSum += overlapScore(i, sessionList.get(currentRow).get(a).getid()); //stop this madness
+						}
 					}
 					if(minScoreSession==-1||(tempCurrentScoreSum<minTotalScore||(tempCurrentScoreSum==minTotalScore&&popularityBySession.get(i-1)>popularityBySession.get(minScoreSession-1)))) {
-						if(numScheduledPerSession.get(i-1)>0&&idsOfPermissableDoubles.indexOf(i)==-1) {
-							//do nothing
-						} else {
-						minScoreSession = i;
-						minTotalScore = tempCurrentScoreSum;
+						if(!(numScheduledPerSession.get(i-1)>0||idsOfPermissableDoubles.indexOf(i)==-1)) {
+							minScoreSession = i;
+							minTotalScore = tempCurrentScoreSum;
 						}
 					}
 				}
