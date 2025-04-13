@@ -117,21 +117,22 @@ public class SeniorSeminar{
 		}*/
 	}
 	public void fillTimeSlots(){
-
+		sessionList.get(0).add(new Session(4, 1));
+		sessionList.get(0).add(new Session(6, 1));
+		System.out.println(calculateNextBestSessionToFill(0,2));
 	}
 	public ArrayList<Integer> calculateNextBestSessionToFill(int currentRow, int currentIndex){ //1-indexed
 		for(int i=0; i<numSessions; i++){
 			numScheduledPerSession.add(0);
 		}//filling nsps with 0s to help with the following block of code
 		int numOfSessionsToCheckAgainst = currentIndex;
-		int minScoreSession=-1;
 		if(currentIndex==0){
 			int tempMinRow=-1;
 			int tempMinCol=-1;
 			int tempMinScore=-1;
 			for(int b=1; b<=numSessions; b++){
 				for(int c=1; c<=numSessions; c++){
-					if((tempMinScore==-1||overlapScore(b, c)<tempMinScore)||(overlapScore(b, c)==tempMinScore && (popularityBySession.get(b)+popularityBySession.get(c))>(popularityBySession.get(tempMinCol)+popularityBySession.get(tempMinRow)))){
+					if((tempMinScore==-1||overlapScore(b, c)<tempMinScore)||(overlapScore(b, c)==tempMinScore && (popularityBySession.get(b-1)+popularityBySession.get(c-1))>(popularityBySession.get(tempMinCol-1)+popularityBySession.get(tempMinRow-1)))){
 						tempMinScore = overlapScore(b, c);
 						tempMinRow = b;
 						tempMinCol = c;
@@ -143,23 +144,31 @@ public class SeniorSeminar{
 			tempListToReturn.add(tempMinCol);
 			return tempListToReturn;
 		} else {
-		for(int i=1; i<=numSessions; i++){
-			if(!existsInRow(currentRow, i)&&numScheduledPerSession.get(i-1)<2){ //don't schedule twice per row or more than 2 in total
-				int tempCurrentScoreSum=0;
+			int minScoreSession=-1;
+			int minTotalScore=-1;
+			for(int i=1; i<=numSessions; i++){
+				if(!existsInRow(currentRow, i)&&numScheduledPerSession.get(i-1)<2){ //don't schedule twice per row or more than 2 in total
+					int tempCurrentScoreSum=0;
 					for(int a=0; a<currentIndex; a++){//checking against every so far filled in 
 						tempCurrentScoreSum += overlapScore(i, sessionList.get(currentRow).get(0).getid()); //stop this madness
 					}
-					
+					if(minScoreSession==-1||(tempCurrentScoreSum<minTotalScore||(tempCurrentScoreSum==minTotalScore&&popularityBySession.get(i-1)>popularityBySession.get(minScoreSession-1)))) {
+						minScoreSession = i;
+						minTotalScore = tempCurrentScoreSum;
+					}
 				}
-			}
+			} //below we have a best session
+			ArrayList<Integer> tempListToReturn = new ArrayList<Integer>();
+			tempListToReturn.add(minScoreSession);
+			return tempListToReturn;
 		}
 	}
 	
 	public int overlapScore(int sessiona, int sessionb){ //yet another helper function, calculates overlap using the overlap lookup table
-		return overlapTable.get(sessiona-1).get(sessionb-1);
+		return overlapTable.get(sessiona).get(sessionb);
 	}
 	public boolean existsInRow(int row, int session){ //1-indexed
-		for(Session s:sessionList.get(row-1)){
+		for(Session s:sessionList.get(row)){
 			if(s.getid()==session) return true;
 		}
 		return false;
