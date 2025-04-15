@@ -210,7 +210,7 @@ public class SeniorSeminar{
 			}
 			if (minScoreSession==-1) { //dont have clue why this fallback is necessary
 				for (int i = 1; i <= numSessions; i++) {
-					if (!existsInRow(currentRow, i) && numScheduledPerSession.get(i - 1) < 2) {
+					if (!existsInRow(currentRow, i) && numScheduledPerSession.get(i - 1)<2) {
 						minScoreSession = i;
 						break;
 					}
