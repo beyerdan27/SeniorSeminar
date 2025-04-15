@@ -3,12 +3,12 @@ public class Student{
 	ArrayList<Integer> choices;
 	String name;
 	boolean hasChosen;
-	int id;
+	int id, maxOverlapPotential;
 	public Student(int id, String name, int choice1, int choice2, int choice3, int choice4, int choice5){
 		choices = new ArrayList<Integer>();
 		this.id = id;
 		this.name = name;
-		if(choice1==choice2 && choice2==choice3 && choice3==choice4 && choice4==choice5 && choice5==0){
+		if(choice1==choice2 && ((choice2==choice3 && choice3==choice4) && (choice4==choice5 && choice5==0))){
 			hasChosen = false;
 		} else {
 			hasChosen = true;
@@ -26,6 +26,9 @@ public class Student{
 		return choices.get(num-1);
 	}
 	public int getid(){return id;}
-	public ArrayList<Integer> getchs(){return choices;};
+	public ArrayList<Integer> getchs(){return choices;}
+	public int getMaxOverlapPotential(){return maxOverlapPotential;}
+	public void setMaxOverlapPotential(int s){maxOverlapPotential = s;}
+	public boolean isChosen(){return hasChosen;}
 
 }

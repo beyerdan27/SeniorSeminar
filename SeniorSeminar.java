@@ -158,7 +158,7 @@ public class SeniorSeminar{
 		for(int col=0; col<numClassrooms; col++){
 			for(int row=0; row<numTimeSlots; row++){
 				if(col!=sessionList.get(row).size()-1) col = sessionList.get(row).size();
-				ArrayList<Integer> tempToBeInserted = new ArrayList<Integer>();
+				ArrayList<Integer> tempToBeInserted;
 				tempToBeInserted = calculateNextBestSessionToFill(row, col);
 				if(tempToBeInserted.size()>1){
 					sessionList.get(row).add(new Session(tempToBeInserted.get(0), numScheduledPerSession.get(tempToBeInserted.get(0)-1)+1, row+1, col+1));
@@ -200,7 +200,7 @@ public class SeniorSeminar{
 					}
 				}
 			} //1st case return below
-			ArrayList<Integer> tempListToReturn = new ArrayList<Integer>(); //it's an arraylist bc sometimes the method returns two, sometimes one
+			ArrayList<Integer> tempListToReturn = new ArrayList<>(); //it's an arraylist bc sometimes the method returns two, sometimes one
 			tempListToReturn.add(tempMinRow);
 			tempListToReturn.add(tempMinCol);
 			return tempListToReturn;
@@ -232,7 +232,7 @@ public class SeniorSeminar{
 			}
 			//below we have a best session
 			//if(minScoreSession==-1) System.out.println(tempCurrentScoreSum);
-			ArrayList<Integer> tempListToReturn = new ArrayList<Integer>();
+			ArrayList<Integer> tempListToReturn = new ArrayList<>();
 			tempListToReturn.add(minScoreSession);
 			return tempListToReturn;
 		}
@@ -247,5 +247,38 @@ public class SeniorSeminar{
 		}
 		return false;
 	}
+	public void fillSessions(){
+		//copy studentlist
+		ArrayList<Student> modifiableStudents = new ArrayList<Student>(studentList);
+		ArrayList<Student> studentsByPriority = new ArrayList<Student>();
+		//calculate max overlap potential of any student on the list
+		//max it. remove that person, add the studentsbypriority
+		//repeat until the 5 with 0s are left
+		for(int i=0; i<numStudents; i++){
+			int tempNumConflicts=0;
+			int tempNumScheduledInRow;
+			for(int a=0; a<numTimeSlots; a++){
+				tempNumScheduledInRow=0;
+				for(int b=0; b<numClassrooms; b++){ //yes this is O(n^3) chill
+					if(isInChoices(studentList.get(i), sessionList.get(a).get(b).getid())){
+						if(tempNumScheduledInRow==0){
+							tempNumScheduledInRow=1;
+						} else {
+							tempNumScheduledInRow=2;
+							tempNumConflicts++; //PICK UP HEREEEEEE PICK UP HEREEEEEEEEEEEe
+						}
+					}
+				}
+			}
+
+		}
+	}
+	public boolean isInChoices(Student s, int id){
+		for(int k=1; k<6; k++){
+			if(s.getch(k)==id) return true;
+		}
+		return false;
+	}
+	public void startUserSession(){}//handles user input and control
 	public boolean getYN(){return false;}//this will be for later when dealing with user input flow/control to get a simple yes/no answer
 }
