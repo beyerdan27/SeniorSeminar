@@ -26,5 +26,6 @@ public class Student{
 		return choices.get(num-1);
 	}
 	public int getid(){return id;}
+	public ArrayList<Integer> getchs(){return choices;};
 
 }
