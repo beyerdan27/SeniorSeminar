@@ -107,7 +107,7 @@ public class SeniorSeminar{
 			idsOfPermissableDoubles.add(tempMax+1);
 			tempPop.set(tempMax, -1);
 		} 
-		//System.out.println(idsOfPermissableDoubles);
+		System.out.println(idsOfPermissableDoubles);
 		//System.out.println(popularityBySession);
 		//calculating overlap matrix
 		for(int i=1; i<=numSessions; i++){
@@ -141,6 +141,11 @@ public class SeniorSeminar{
 			numScheduledPerSession.add(0); //helpful bc have to use .set method, .add would definitely break future code
 		}//filling nsps with 0s to help with the following block of code
 	}
+	public void sortAndPrintPopularity(){
+		NewInsertion n = new NewInsertion();
+		ArrayList<Integer> sortedPop = n.insertionSort(popularityBySession);
+		System.out.println("\n"+sortedPop);
+	}
 	public void fillTimeSlots(){ //essentially just rides on the back of calculateNextBestSessionToBeFilled, uses it to fill in the table
 		//also for future reference - prioritizing students whose schedules have the MOST overlap/overlap potential for the schedule that has been optimized, that to lesser, then lastly the students without any choices
 		//sessionList.get(0).add(new Session(11, 1));
@@ -170,7 +175,7 @@ public class SeniorSeminar{
 		for(int a=0; a<5; a++){
 			System.out.println();
 			for(int b=0; b<5; b++){
-				System.out.print(sessionList.get(a).get(b).getid()+" ");
+				System.out.print(sessionList.get(a).get(b).getid()+"-" + sessionList.get(a).get(b).getSpecIndex()+" ");
 			}
 		}
 
