@@ -1,11 +1,13 @@
 import java.util.ArrayList;
 public class Student{
 	ArrayList<Integer> choices;
+	ArrayList<Integer> placements;
 	String name;
 	boolean hasChosen;
 	int id, maxOverlapPotential;
 	public Student(int id, String name, int choice1, int choice2, int choice3, int choice4, int choice5){
-		choices = new ArrayList<Integer>();
+		choices = new ArrayList<>();
+		placements = new ArrayList<>(5);
 		this.id = id;
 		this.name = name;
 		if(choice1==choice2 && ((choice2==choice3 && choice3==choice4) && (choice4==choice5 && choice5==0))){
@@ -30,5 +32,11 @@ public class Student{
 	public int getMaxOverlapPotential(){return maxOverlapPotential;}
 	public void setMaxOverlapPotential(int s){maxOverlapPotential = s;}
 	public boolean isChosen(){return hasChosen;}
-
+	public void addPlacement(int timeSlot, int classroomNum){ //0-indexed yes that means the nomenclature is messed up
+		placements.set(timeSlot, classroomNum);
+	}
+	public ArrayList<Integer> getPlacements(){return placements;}
+	public int getPlacement(int timeSlot){ //0-indexed as well
+		return placements.get(timeslot);
+	}
 }

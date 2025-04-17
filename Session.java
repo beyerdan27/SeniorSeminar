@@ -1,6 +1,10 @@
+import java.util.ArrayList;
 public class Session{
-	int sessionID, specIndex, presenterID, timeSlot, classroomNum;
+	int sessionID, specIndex, presenterID, timeSlot, classroomNum, numStudents;
+	ArrayList<Student> studentsIn;
 	public Session(){
+		numStudents=0;
+		studentsIn = new ArrayList<>();
 		sessionID=-1;
 		specIndex=-1;
 		//presenterID=-1;
@@ -8,6 +12,8 @@ public class Session{
 		classroomNum=-1;
 	}
 	public Session(int sessionID, int specIndex){
+		numStudents=0;
+		studentsIn = new ArrayList<>();
 		this.sessionID=sessionID;
 		this.specIndex=specIndex;
 		//code to figure out and assign the presenter id soon
@@ -16,6 +22,8 @@ public class Session{
 		classroomNum=-1;
 	}
 	public Session(int sessionID, int specIndex, int timeSlot, int classroomNum){
+		numStudents=0;
+		studentsIn = new ArrayList<>();
 		this.sessionID=sessionID;
 		this.specIndex=specIndex;
 		this.timeSlot=timeSlot;
@@ -31,4 +39,9 @@ public class Session{
 	public int getTimeSlot(){return timeSlot;}
 	public void setClassroomNum(int classroomNum){this.classroomNum=classroomNum;}
 	public int getClassroomNum(){return classroomNum;}
+	public void addStudent(Student s){
+		studentsIn.add(s);
+		numStudents = studentsIn.size();
+	}
+	public int getNumStudents(){return numStudents;}
 }

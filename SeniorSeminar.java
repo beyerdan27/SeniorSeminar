@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 public class SeniorSeminar{
-	int numTimeSlots, numClassrooms, maxInClass;
+	int numTimeSlots, numClassrooms, maxInClass, numStudentsWhoHaveNotChosen;
 	Scanner univScan;
 	ArrayList<ArrayList<Session>> sessionList;
 	ArrayList<Student> studentList;
@@ -140,6 +140,12 @@ public class SeniorSeminar{
 		for(int i=0; i<numSessions; i++){
 			numScheduledPerSession.add(0); //helpful bc have to use .set method, .add would definitely break future code
 		}//filling nsps with 0s to help with the following block of code
+
+		//counting how many students have NOT chosen
+		for(Student s:studentList){
+			if(!s.isChosen()) numStudentsWhoHaveNotChosen++;
+		}
+		System.out.println("# SWHNT: " + numStudentsWhoHaveNotChosen);
 	}
 	public void sortAndPrintPopularity(){
 		NewInsertion n = new NewInsertion();
@@ -251,6 +257,7 @@ public class SeniorSeminar{
 		//copy studentlist
 		ArrayList<Student> modifiableStudents = new ArrayList<Student>(studentList);
 		ArrayList<Student> studentsByPriority = new ArrayList<Student>();
+		ArrayList<Integer> conflictsByStudent = new ArrayList<>();
 		//calculate max overlap potential of any student on the list
 		//max it. remove that person, add the studentsbypriority
 		//repeat until the 5 with 0s are left
@@ -265,12 +272,29 @@ public class SeniorSeminar{
 							tempNumScheduledInRow=1;
 						} else {
 							tempNumScheduledInRow=2;
-							tempNumConflicts++; //PICK UP HEREEEEEE PICK UP HEREEEEEEEEEEEe
+							tempNumConflicts++;
 						}
 					}
 				}
 			}
-
+			conflictsByStudent.add(tempNumConflicts);
+		}
+		//filling studentsByPriority 
+	}
+	public void scheduleStudent(Student s){
+		for(int row=0; row<numTimeSlots; row++){ //row is the timeslot
+			ArrayList<Session> tempPotentialSessions = new ArrayList<>();
+			for(int col=0; col<numClassrooms; col++){ //col is the classroom aka its iterating over the sessions offered at a specific timeslot
+				if(isInChoices(s, sessionList.get(row).get(col).getid())){ //if the students wants the current session upon which we're iterating
+					tempPotentialSessions.add(sessionList.get(row).get(col));
+				}
+			}
+			//now filling arraylist of length numclassrooms which are full
+			for(int i=0; i<numClassrooms; i++){
+				if(sessionList.get(row).get(i).getNumStudents()>=16){
+					if(tempPotentialSessions.indexOf(sessionList.get(row).get(i))!=-1)
+				}
+			}
 		}
 	}
 	public boolean isInChoices(Student s, int id){
@@ -278,6 +302,12 @@ public class SeniorSeminar{
 			if(s.getch(k)==id) return true;
 		}
 		return false;
+	}
+	public boolean isFull(Session s){
+		return (s.getNumStudents()>=16);
+	}
+	public boolean isFull(int row, int col){ //overloaded || 0-indexed as well
+		return (sessionList.get(row).get(col).getNumStudents()>=16);
 	}
 	public void startUserSession(){}//handles user input and control
 	public boolean getYN(){return false;}//this will be for later when dealing with user input flow/control to get a simple yes/no answer
