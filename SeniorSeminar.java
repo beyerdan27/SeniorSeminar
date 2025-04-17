@@ -289,11 +289,17 @@ public class SeniorSeminar{
 					tempPotentialSessions.add(sessionList.get(row).get(col));
 				}
 			}
-			//now filling arraylist of length numclassrooms which are full
+			//now removing the sessions we can't attend
 			for(int i=0; i<numClassrooms; i++){
-				if(sessionList.get(row).get(i).getNumStudents()>=16){
-					if(tempPotentialSessions.indexOf(sessionList.get(row).get(i))!=-1)
+				if(isFull(sessionList.get(row).get(i))){
+					int indexInQuestion=tempPotentialSessions.indexOf(sessionList.get(row).get(i));
+					if(indexInQuestion!=-1){
+						tempPotentialSessions.remove(indexInQuestion);
+					}
 				}
+			}
+			while(true){
+				//PICK UP HERE, finding the min popularity of the temppotentialsessions, etc etc PICK UP HEREEEEE
 			}
 		}
 	}
