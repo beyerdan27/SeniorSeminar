@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 public class Session{
 	int sessionID, specIndex, presenterID, timeSlot, classroomNum, numStudents;
-	ArrayList<Student> studentsIn;
+	ArrayList<Integer> studentsIn;
 	public Session(){
 		numStudents=0;
 		studentsIn = new ArrayList<>();
@@ -40,8 +40,11 @@ public class Session{
 	public void setClassroomNum(int classroomNum){this.classroomNum=classroomNum;}
 	public int getClassroomNum(){return classroomNum;}
 	public void addStudent(Student s){
-		studentsIn.add(s);
+		studentsIn.add(s.getid());
 		numStudents = studentsIn.size();
 	}
 	public int getNumStudents(){return numStudents;}
+	public ArrayList<Integer> getRoster(){
+		return studentsIn;
+	}
 }

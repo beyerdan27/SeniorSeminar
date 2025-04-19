@@ -17,6 +17,7 @@ public class SeniorSeminar{
 	int numDoublesScheduled;
 	int numDoublesAllowed;
 	ArrayList<Integer> idsOfPermissableDoubles;
+	int averageEfficacy;
 	
 	public SeniorSeminar(int numTimeSlots, int numClassrooms, int maxInClass){
 		idsOfPermissableDoubles = new ArrayList<Integer>(); //stores the top numTimeSlots*numClassrooms-numSessions sessions in popularity
@@ -292,6 +293,8 @@ public class SeniorSeminar{
 		} //now that i think about it, SBP is probably unnecessary memory - could just schedule in the above loop
 		//looping through students by priority, scheduling index 0, removing index 0
 		for(Student s:studentsByPriority){scheduleStudent(s);} //scheduling every student
+		System.out.println("\n" + studentList.get(61).getPlacements()); //15, 1, 7, 9, 2
+		System.out.println(sessionList.get(0).get(0).getRoster());
 	}
 	public void scheduleStudent(Student s){ //edits arraylists accordingly to fully schedule a student
 		for(int row=0; row<numTimeSlots; row++){ //row is the timeslot
@@ -328,6 +331,7 @@ public class SeniorSeminar{
 				//actually schedule the session: add student to session roster, add placement to student
 				tempPotentialSessions.get(minPopIndex).addStudent(s); //adding student to session roster
 				s.addPlacement(row, tempPotentialSessions.get(minPopIndex).getClassroomNum()); //adding placement to students arraylist
+				s.removeChoice(tempPotentialSessions.get(minPopIndex).getid());			
 			} else {
 				int minPop2 = -1; //this minpop accounts for num of students already in the session, as shown below
 				int minPopIndex2 = -1;
@@ -342,7 +346,8 @@ public class SeniorSeminar{
 				} //minpop session found: miniPopIndex2
 				//actually scheduling the session below
 				sessionList.get(row).get(minPopIndex2).addStudent(s); //adding student to session roster
-				s.addPlacement(row, sessionList.get(row).get(minPopIndex2).getClassroomNum()); //adding placement to students arraylist				
+				s.addPlacement(row, sessionList.get(row).get(minPopIndex2).getClassroomNum()); //adding placement to students arraylist
+				s.removeChoice(sessionList.get(row).get(minPopIndex2).getid());				
 			}
 		}
 	}
@@ -357,6 +362,21 @@ public class SeniorSeminar{
 	}
 	public boolean isFull(int row, int col){ //overloaded & 0-indexed as well
 		return (sessionList.get(row).get(col).getNumStudents()>=16);
+	}
+	public void evaluateEfficacy(){
+		double tempTotalEfficacy = 0.0; //double for the division in the print statement
+		int numCountedStudents = 0;
+		for(Student s:studentList){
+			if(s.isChosen()){
+				numCountedStudents++;
+				for(int i=0; i<5; i++){ //for each placement in Student object = for each row
+					if(s.isInStaticChoices(sessionList.get(i).get(s.getPlacement(i)).getid())){
+						tempTotalEfficacy++;
+					}
+				}
+			}
+		}
+		System.out.println("Average efficacy: " + tempTotalEfficacy/numCountedStudents);
 	}
 	public void startUserSession(){}//handles user input and control
 	public boolean getYN(){return false;}//this will be for later when dealing with user input flow/control to get a simple yes/no answer

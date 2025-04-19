@@ -4,5 +4,6 @@ public class Tester{
 		temp.aggregateData();
 		temp.fillTimeSlots();
 		temp.fillSessions();
+		temp.evaluateEfficacy();
 	}
 }
