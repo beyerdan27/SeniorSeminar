@@ -77,7 +77,7 @@ public class SeniorSeminar{
 		}*/
 		//tallying popularity - dont know why getch is 1-indexed, not like i'm ever calling it as a one-off
 		numSessions = presenterList.size(); //annoyingly useful variable
-		numStudents = studentList.size();
+		numStudents = studentList.size(); //annoyingly more useful variable
 		for(int i=1; i<=numSessions; i++){
 			int tempct=0;
 			for(int j=0; j<numStudents; j++){
@@ -358,10 +358,10 @@ public class SeniorSeminar{
 		return false;
 	}
 	public boolean isFull(Session s){
-		return (s.getNumStudents()>=16);
+		return (s.getNumStudents()>=maxInClass);
 	}
 	public boolean isFull(int row, int col){ //overloaded & 0-indexed as well
-		return (sessionList.get(row).get(col).getNumStudents()>=16);
+		return (sessionList.get(row).get(col).getNumStudents()>=maxInClass);
 	}
 	public void evaluateEfficacy(){
 		double tempTotalEfficacy = 0.0; //double for the division in the print statement

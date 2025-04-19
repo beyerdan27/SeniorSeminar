@@ -52,4 +52,5 @@ public class Student{
 		}
 		return false;
 	}
+	public ArrayList<Integer> getStaticChoices(){return staticChoices;}
 }
