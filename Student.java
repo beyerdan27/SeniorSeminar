@@ -37,6 +37,6 @@ public class Student{
 	}
 	public ArrayList<Integer> getPlacements(){return placements;}
 	public int getPlacement(int timeSlot){ //0-indexed as well
-		return placements.get(timeslot);
+		return placements.get(timeSlot);
 	}
 }

@@ -266,7 +266,7 @@ public class SeniorSeminar{
 			int tempNumScheduledInRow;
 			for(int a=0; a<numTimeSlots; a++){
 				tempNumScheduledInRow=0;
-				for(int b=0; b<numClassrooms; b++){ //yes this is O(n^3) chill
+				for(int b=0; b<numClassrooms; b++){ //yes this is O(n^3), chill
 					if(isInChoices(studentList.get(i), sessionList.get(a).get(b).getid())){
 						if(tempNumScheduledInRow==0){
 							tempNumScheduledInRow=1;
@@ -281,7 +281,7 @@ public class SeniorSeminar{
 		}
 		//filling studentsByPriority 
 	}
-	public void scheduleStudent(Student s){
+	public void scheduleStudent(Student s){ //edits arraylists accordingly to fully schedule a student
 		for(int row=0; row<numTimeSlots; row++){ //row is the timeslot
 			ArrayList<Session> tempPotentialSessions = new ArrayList<>();
 			for(int col=0; col<numClassrooms; col++){ //col is the classroom aka its iterating over the sessions offered at a specific timeslot
@@ -298,8 +298,39 @@ public class SeniorSeminar{
 					}
 				}
 			}
-			while(true){
-				//PICK UP HERE, finding the min popularity of the temppotentialsessions, etc etc PICK UP HEREEEEE
+				//go through the possible sessions, if length > 0
+				//if length = 0 aka no vacant sessions left in choices, find the least popular one that is not full
+				//if length > 0, find the least popular of the sessions in choices and pick that one
+				int tpsSize = tempPotentialSessions.size();
+			if(tpsSize>0){
+				int minPop=popularityBySession.get(tempPotentialSessions.get(0).getid()-1); //just setting minpop to the first one for the sake of argument
+				int minPopIndex = 0; //SAA
+				for(int j=1; j<tpsSize; j++){ //simple loop to find the least popular session
+					int tempPop=popularityBySession.get(tempPotentialSessions.get(j).getid()-1)
+					if(tempPop<minPop){ //remember ALWAYS subtract one from ids when accessing PBS bc ids are 1-indexed
+						minPopIndex=j;
+						minPop = tempPop;
+					}
+				}
+				//now, the least popular session index of TPS is minPopIndex
+				//actually schedule the session: add student to session roster, add placement to student
+				tempPotentialSessions.get(minPopIndex).addStudent(s); //adding student to session roster
+				s.addPlacement(row+1, tempPotentialSessions.get(minPopIndex).getClassroomNum()); //adding placement to students arraylist
+			} else {
+				int minPop2 = -1; //this minpop accounts for num of students already in the session, as shown below
+				int minPopIndex2 = -1;
+				for(int k=0; k<numClassrooms; k++){
+					if(!isFull(sessionList.get(row).get(k))){ //can't schedule in a full session, also would be impossible for all sessions in a row to be full, so this won't softlock
+						int tempPop2 = popularityBySession.get(sessionList.get(row).get(k).getid()-1) + sessionList.get(row).get(k).getNumStudents();
+						if(tempPop2<minPop2||minPop2==-1){
+							minPop2 = tempPop2;
+							minPopIndex2 = k;
+						}
+					}
+				} //minpop session found: miniPopIndex2
+				//actually scheduling the session below
+				tempPotentialSessions.get(minPopIndex2).addStudent(s); //adding student to session roster
+				s.addPlacement(row+1, tempPotentialSessions.get(minPopIndex2).getClassroomNum()); //adding placement to students arraylist				
 			}
 		}
 	}
@@ -312,7 +343,7 @@ public class SeniorSeminar{
 	public boolean isFull(Session s){
 		return (s.getNumStudents()>=16);
 	}
-	public boolean isFull(int row, int col){ //overloaded || 0-indexed as well
+	public boolean isFull(int row, int col){ //overloaded & 0-indexed as well
 		return (sessionList.get(row).get(col).getNumStudents()>=16);
 	}
 	public void startUserSession(){}//handles user input and control
