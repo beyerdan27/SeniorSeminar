@@ -8,7 +8,7 @@ public class Student{
 	public Student(int id, String name, int choice1, int choice2, int choice3, int choice4, int choice5){
 		choices = new ArrayList<>();
 		placements = new ArrayList<>(5);
-		for(int i=0; i<4; i++){placements.add(-1);} //filling with -1s so i am not bombarded by java.lang.IndexOutOfBoundsException
+		for(int i=0; i<5; i++){placements.add(-1);} //filling with -1s so i am not bombarded by java.lang.IndexOutOfBoundsException
 		this.id = id;
 		this.name = name;
 		if(choice1==choice2 && ((choice2==choice3 && choice3==choice4) && (choice4==choice5 && choice5==0))){
