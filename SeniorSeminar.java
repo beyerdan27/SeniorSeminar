@@ -254,14 +254,17 @@ public class SeniorSeminar{
 		return false;
 	}
 	public void fillSessions(){
-		//copy studentlist
-		ArrayList<Student> modifiableStudents = new ArrayList<Student>(studentList);
+		//copy studentlist, nvm don't really need to
+		//ArrayList<Student> modifiableStudents = new ArrayList<Student>(studentList);
 		ArrayList<Student> studentsByPriority = new ArrayList<Student>();
 		ArrayList<Integer> conflictsByStudent = new ArrayList<>();
 		//calculate max overlap potential of any student on the list
-		//max it. remove that person, add the studentsbypriority
-		//repeat until the 5 with 0s are left
-		for(int i=0; i<numStudents; i++){
+		//max it. remove that person, add to studentsbypriority
+		for(int i=0; i<numStudents; i++){ //0-indexed, while student ids are 1-indexed
+			if(!studentList.get(i).isChosen()){ //handling the cases when student hasn't picked
+				conflictsByStudent.add(-1); //-1 isn't special, any negative will do; just ensuring the 5 (or N) that haven't picked get scheduled last 
+				continue;
+			}
 			int tempNumConflicts=0;
 			int tempNumScheduledInRow;
 			for(int a=0; a<numTimeSlots; a++){
@@ -271,7 +274,7 @@ public class SeniorSeminar{
 						if(tempNumScheduledInRow==0){
 							tempNumScheduledInRow=1;
 						} else {
-							tempNumScheduledInRow=2;
+							tempNumScheduledInRow=2; //yes, if a student has three in a row, tNSIR still is set to 2, but whatever. it will still work.
 							tempNumConflicts++;
 						}
 					}
@@ -280,6 +283,15 @@ public class SeniorSeminar{
 			conflictsByStudent.add(tempNumConflicts);
 		}
 		//filling studentsByPriority 
+		for(int c=0; c<numStudents; c++){ //can't use while loop for CBS.size() > 0 bc not removing the index bc the index order corresponds to studentID and we need this
+			//max it, find the index, add to SBP, set it to -2 (lesser than those that haven't chosen)
+			int maxConflicts = Collections.max(conflictsByStudent);
+			int maxConflictsIndex = conflictsByStudent.indexOf(maxConflicts);
+			studentsByPriority.add(studentList.get(maxConflictsIndex)); //both 0-indexed; adding the student obj with max conflicts to SBP
+			conflictsByStudent.set(maxConflictsIndex, -2);
+		} //now that i think about it, SBP is probably unnecessary memory - could just schedule in the above loop
+		//looping through students by priority, scheduling index 0, removing index 0
+		for(Student s:studentsByPriority){scheduleStudent(s);} //scheduling every student
 	}
 	public void scheduleStudent(Student s){ //edits arraylists accordingly to fully schedule a student
 		for(int row=0; row<numTimeSlots; row++){ //row is the timeslot
@@ -306,7 +318,7 @@ public class SeniorSeminar{
 				int minPop=popularityBySession.get(tempPotentialSessions.get(0).getid()-1); //just setting minpop to the first one for the sake of argument
 				int minPopIndex = 0; //SAA
 				for(int j=1; j<tpsSize; j++){ //simple loop to find the least popular session
-					int tempPop=popularityBySession.get(tempPotentialSessions.get(j).getid()-1)
+					int tempPop=popularityBySession.get(tempPotentialSessions.get(j).getid()-1);
 					if(tempPop<minPop){ //remember ALWAYS subtract one from ids when accessing PBS bc ids are 1-indexed
 						minPopIndex=j;
 						minPop = tempPop;
@@ -315,7 +327,7 @@ public class SeniorSeminar{
 				//now, the least popular session index of TPS is minPopIndex
 				//actually schedule the session: add student to session roster, add placement to student
 				tempPotentialSessions.get(minPopIndex).addStudent(s); //adding student to session roster
-				s.addPlacement(row+1, tempPotentialSessions.get(minPopIndex).getClassroomNum()); //adding placement to students arraylist
+				s.addPlacement(row, tempPotentialSessions.get(minPopIndex).getClassroomNum()); //adding placement to students arraylist
 			} else {
 				int minPop2 = -1; //this minpop accounts for num of students already in the session, as shown below
 				int minPopIndex2 = -1;
@@ -329,8 +341,8 @@ public class SeniorSeminar{
 					}
 				} //minpop session found: miniPopIndex2
 				//actually scheduling the session below
-				tempPotentialSessions.get(minPopIndex2).addStudent(s); //adding student to session roster
-				s.addPlacement(row+1, tempPotentialSessions.get(minPopIndex2).getClassroomNum()); //adding placement to students arraylist				
+				sessionList.get(row).get(minPopIndex2).addStudent(s); //adding student to session roster
+				s.addPlacement(row, sessionList.get(row).get(minPopIndex2).getClassroomNum()); //adding placement to students arraylist				
 			}
 		}
 	}
