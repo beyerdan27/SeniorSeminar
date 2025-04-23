@@ -87,14 +87,14 @@ public class SeniorSeminar{
 			}
 			popularityBySession.add(tempct);
 		}
-		int temppp=0;
+		/*int temppp=0;
 		for(int i:popularityBySession){
 			temppp++; //temporary promise
 			System.out.println("Session " + temppp + " popularity: " + i);
 		}
 		for(Student s:studentList){
 			System.out.println("Student #" + s.getid() + ": " + s.getchs());
-		}
+		}*/
 		//System.out.println("sessions" + numSessions);
 		//System.out.println("students" + numStudents);
 		//System.out.println("pop"+popularityBySession.size());
@@ -102,19 +102,19 @@ public class SeniorSeminar{
 		//calculating permissable doubles, used later in cnbstf
 		numDoublesScheduled=0;
 		numDoublesAllowed = (numTimeSlots * numClassrooms) - numSessions;
-		ArrayList<Integer> tempPop = new ArrayList<Integer>(popularityBySession);
+		ArrayList<Integer> tempPop = new ArrayList<>(popularityBySession);
 		for(int i=0; i<numDoublesAllowed; i++){ //calculates the most popular sessions by repeatedly maxing and removing arraylist and elements respectively
 			int tempMax = tempPop.indexOf(Collections.max(tempPop));
 			idsOfPermissableDoubles.add(tempMax+1);
 			tempPop.set(tempMax, -1);
 		} 
-		System.out.println(idsOfPermissableDoubles);
+		//System.out.println(idsOfPermissableDoubles);
 		//System.out.println(popularityBySession);
 		//calculating overlap matrix
 		for(int i=1; i<=numSessions; i++){
-			ArrayList<Integer> tempList = new ArrayList<Integer>();
+			ArrayList<Integer> tempList = new ArrayList<>();
 			//calc order 1 popluarity/overlap list
-			ArrayList<Student> overlaplist1 = new ArrayList<Student>();
+			ArrayList<Student> overlaplist1 = new ArrayList<>();
 			for(int k=0; k<numStudents; k++){
 				for(int m=1; m<6; m++){
 					if((studentList.get(k)).getch(m)==i) overlaplist1.add(studentList.get(k)); //REMEMBER, MACHING I AND J
@@ -146,7 +146,7 @@ public class SeniorSeminar{
 		for(Student s:studentList){
 			if(!s.isChosen()) numStudentsWhoHaveNotChosen++;
 		}
-		System.out.println("# SWHNT: " + numStudentsWhoHaveNotChosen);
+		//System.out.println("# SWHNT: " + numStudentsWhoHaveNotChosen);
 	}
 	public void sortAndPrintPopularity(){
 		NewInsertion n = new NewInsertion();
@@ -296,7 +296,7 @@ public class SeniorSeminar{
 		System.out.println("\n" + studentList.get(61).getPlacements()); //15, 1, 7, 9, 2
 		System.out.println(sessionList.get(0).get(0).getRoster());
 	}
-	public void scheduleStudent(Student s){ //edits arraylists accordingly to fully schedule a student
+	public void scheduleStudent(Student s){ //DEPRECATED, dont use this, use scheduleStudent2
 		for(int row=0; row<numTimeSlots; row++){ //row is the timeslot
 			ArrayList<Session> tempPotentialSessions = new ArrayList<>();
 			for(int col=0; col<numClassrooms; col++){ //col is the classroom aka its iterating over the sessions offered at a specific timeslot
@@ -378,6 +378,79 @@ public class SeniorSeminar{
 		}
 		System.out.println("Average efficacy: " + tempTotalEfficacy/numCountedStudents);
 	}
-	public void startUserSession(){}//handles user input and control
-	public boolean getYN(){return false;}//this will be for later when dealing with user input flow/control to get a simple yes/no answer
+	public void startUserSession(){//handles user input and control
+		System.out.println("  _____            _            _____                _                  \n" + //
+		" / ____|          (_)          / ____|              (_)                 \n" + //
+		"| (___   ___ _ __  _  ___  _ _| (___   ___ _ __ ___  _ _ __   __ _ _ __  \n"+ //
+		" \\___ \\ / _ \\ '_ \\| |/ _ \\| '__\\___ \\ / _ \\ '_ ` _ \\| | '_ \\ / _` | '__|\n" + //
+		" ____) |  __/ | | | | (_) | |  ____) |  __/ | | | | | | | | | (_| | |   \n" + //
+		"|_____/ \\___|_| |_|_|\\___/|_| |_____/ \\___|_| |_| |_|_|_| |_|\\__,_|_|   \n" + //
+		"\nLet's schedule some seminars.\n\nConfirm loading and aggregating of data? (Y/N)\n");
+		if(getYN()){
+			try{
+				aggregateData();
+				System.out.print("\n{");
+				for(int i=0;i<13;i++){
+					System.out.print("-");
+					Thread.sleep(10);
+				}
+				System.out.println("}\nData aggregated: " + numSessions + " Sessions, " + numClassrooms + " Classrooms, " + numTimeSlots + " Time Slots, " + numStudents + " Students\n\nUse data to fill schedule? (Y/N)\n");
+			}catch(InterruptedException e){}
+			if(getYN()){
+				fillTimeSlots();
+				fillSessions();
+				evaluateEfficacy();
+				for(;;){
+					System.out.print("User session started, format your response 0-9:" + //
+					"0 - END SESSION" + //
+					"1 - Find student by ID"); //pick up here
+				}
+			} else {
+				try{
+					System.out.println("Closing session...");
+					Thread.sleep(1500);
+					return;
+				} catch(InterruptedException e){
+					return;
+				}
+			}
+		} else {
+			try{
+				System.out.println("Closing session...");
+				Thread.sleep(1500);
+				return;
+			} catch(InterruptedException e){
+				return;
+			}
+		}
+	}
+	public boolean getYN() { //implements a quick scanner to get a y/n input from user - this is a separate method because of how often it was used
+        boolean temp;
+        for (;;) {
+            //System.out.println("tihgn");
+            String response = univScan.nextLine();
+            if (response.equals("Y")) {
+                temp = true;
+                break;
+            }
+            if (response.equals("N")) {
+                temp = false;
+                break; //this is the stupidest possible way to do it I'm sure
+            }
+            System.out.println("\nPlease format your response Y/N:\n");
+        }
+        return temp;
+    }
+	public int getZeroToNine(){ //sameasabove except for 0-9 ints
+ 		int temp;
+        for (;;) {
+            String response = univScan.nextLine();
+            if (response.length()>0 && (response.charAt(0)<=57&&response.charAt(0)>=48)) {
+                temp = Integer.parseInt(response.charAt(0) + "");
+                break;
+            }
+            System.out.println("\nPlease format your response (0-9):\n");
+        }
+        return temp;
+	}
 }
