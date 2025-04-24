@@ -17,7 +17,7 @@ public class SeniorSeminar{
 	int numDoublesScheduled;
 	int numDoublesAllowed;
 	ArrayList<Integer> idsOfPermissableDoubles;
-	int averageEfficacy;
+	double averageEfficacy;
 	
 	public SeniorSeminar(int numTimeSlots, int numClassrooms, int maxInClass){
 		idsOfPermissableDoubles = new ArrayList<Integer>(); //stores the top numTimeSlots*numClassrooms-numSessions sessions in popularity
@@ -179,12 +179,12 @@ public class SeniorSeminar{
 			}
 		}
 
-		for(int a=0; a<5; a++){
+		/*for(int a=0; a<5; a++){
 			System.out.println();
 			for(int b=0; b<5; b++){
 				System.out.print(sessionList.get(a).get(b).getid()+"-" + sessionList.get(a).get(b).getSpecIndex()+" ");
 			}
-		}
+		}//PRINTS OUT EVERY SESSION*/
 
 	}
 	public ArrayList<Integer> calculateNextBestSessionToFill(int currentRow, int currentIndex){ //1-indexed and this decision in retrospect makes me want to punch past me in the face
@@ -293,8 +293,8 @@ public class SeniorSeminar{
 		} //now that i think about it, SBP is probably unnecessary memory - could just schedule in the above loop
 		//looping through students by priority, scheduling index 0, removing index 0
 		for(Student s:studentsByPriority){scheduleStudent(s);} //scheduling every student
-		System.out.println("\n" + studentList.get(61).getPlacements()); //15, 1, 7, 9, 2
-		System.out.println(sessionList.get(0).get(0).getRoster());
+		//System.out.println("\n" + studentList.get(61).getPlacements()); //15, 1, 7, 9, 2
+		//System.out.println(sessionList.get(0).get(0).getRoster());
 	}
 	public void scheduleStudent(Student s){ //DEPRECATED, dont use this, use scheduleStudent2
 		for(int row=0; row<numTimeSlots; row++){ //row is the timeslot
@@ -376,7 +376,8 @@ public class SeniorSeminar{
 				}
 			}
 		}
-		System.out.println("Average efficacy: " + tempTotalEfficacy/numCountedStudents);
+		averageEfficacy = tempTotalEfficacy/numCountedStudents;
+		//System.out.println("Average efficacy: " + tempTotalEfficacy/numCountedStudents);
 	}
 	public void startUserSession(){//handles user input and control
 		System.out.println("  _____            _            _____                _                  \n" + //
@@ -385,7 +386,7 @@ public class SeniorSeminar{
 		" \\___ \\ / _ \\ '_ \\| |/ _ \\| '__\\___ \\ / _ \\ '_ ` _ \\| | '_ \\ / _` | '__|\n" + //
 		" ____) |  __/ | | | | (_) | |  ____) |  __/ | | | | | | | | | (_| | |   \n" + //
 		"|_____/ \\___|_| |_|_|\\___/|_| |_____/ \\___|_| |_| |_|_|_| |_|\\__,_|_|   \n" + //
-		"\nLet's schedule some seminars.\n\nConfirm loading and aggregating of data? (Y/N)\n");
+		"\nLet's schedule some seniors - into some seminars.\n\nConfirm loading and aggregating of data? (Y/N)\n");
 		if(getYN()){
 			try{
 				aggregateData();
@@ -394,20 +395,67 @@ public class SeniorSeminar{
 					System.out.print("-");
 					Thread.sleep(10);
 				}
-				System.out.println("}\nData aggregated: " + numSessions + " Sessions, " + numClassrooms + " Classrooms, " + numTimeSlots + " Time Slots, " + numStudents + " Students\n\nUse data to fill schedule? (Y/N)\n");
+				System.out.println("}\n\nData aggregated: " + numSessions + " Sessions, " + numClassrooms + " Classrooms, " + numTimeSlots + " Time Slots, " + numStudents + " Students\n\nUse data to fill schedule? (Y/N)\n");
 			}catch(InterruptedException e){}
 			if(getYN()){
 				fillTimeSlots();
 				fillSessions();
 				evaluateEfficacy();
+				try{
+					System.out.print("\n{");
+					for(int i=0;i<13;i++){
+						System.out.print("-");
+						Thread.sleep(10);
+					}
+					System.out.println("}\n\nSessions filled; Average efficacy: " + averageEfficacy);
+				}catch(InterruptedException e){}
+				System.out.print("\nUser session started, format your response 0-9:\n\n");
 				for(;;){
-					System.out.print("User session started, format your response 0-9:" + //
-					"0 - END SESSION" + //
-					"1 - Find student by ID"); //pick up here
+					System.out.print("" + //
+					"\t0 - END SESSION\n" + //
+					"\t1 - Find student by ID\n" + //
+					"\t2 - Find student by FULL NAME\n" + //
+					"\t3 - Print roster by Time Slot & Classroom\n" + //
+					"\t4 - Print roster by Session ID\n" + //
+					"\t5 - Print full overlap table of sessions by student choice\n" + //
+					"\t6 - Print full presenter roster\n" + //
+					"\t7 - Print full session schedule\n" + //
+					"\t8 - Print sessionsByPopularity\n" + //
+					"\t9 - Sort and print sessions by popularity using Insertion Sort\n\n");
+					switch(getZeroToNum(0, 9)){
+						case 0:
+							try{
+								System.out.println("\nClosing session...\n");
+								Thread.sleep(1500);
+								return;
+							} catch(InterruptedException e){
+								return;
+							}
+						case 1:
+							System.out.println("Enter a student ID from 1-" + numStudents + ":\n");
+							while(getZeroToNum(1, 74))
+							break;
+						case 2:
+							break;
+						case 3:
+							break;
+						case 4:
+							break;
+						case 5:
+							break;
+						case 6:
+							break;
+						case 7:
+							break;
+						case 8:
+							break;
+						case 9:
+							break;
+					}
 				}
 			} else {
 				try{
-					System.out.println("Closing session...");
+					System.out.println("\nClosing session...\n");
 					Thread.sleep(1500);
 					return;
 				} catch(InterruptedException e){
@@ -416,7 +464,7 @@ public class SeniorSeminar{
 			}
 		} else {
 			try{
-				System.out.println("Closing session...");
+				System.out.println("\nClosing session...\n");
 				Thread.sleep(1500);
 				return;
 			} catch(InterruptedException e){
@@ -441,15 +489,28 @@ public class SeniorSeminar{
         }
         return temp;
     }
-	public int getZeroToNine(){ //sameasabove except for 0-9 ints
+	public int getNumToNum(int z, int n){ //sameasabove except for ints
  		int temp;
         for (;;) {
             String response = univScan.nextLine();
-            if (response.length()>0 && (response.charAt(0)<=57&&response.charAt(0)>=48)) {
-                temp = Integer.parseInt(response.charAt(0) + "");
-                break;
-            }
-            System.out.println("\nPlease format your response (0-9):\n");
+            if (response.length()>0) {
+				int templen = response.length();
+				boolean tempgood=true;
+				for(int i=0;i<templen; i++){
+					if(!(response.charAt(i)<=(48+n)&&response.charAt(i)>=(48+z))){
+						tempgood=false;
+					}
+				}
+				if(tempgood){
+					temp = Integer.parseInt(response);
+					break; //pick up here finish method
+				} else {
+					System.out.println("\nPlease format your response (" + z + "-" + n + "):\n");
+				}
+
+            } else {
+            System.out.println("\nPlease format your response (" + z + "-" + n + "):\n");
+			}
         }
         return temp;
 	}
