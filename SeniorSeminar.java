@@ -372,6 +372,7 @@ public class SeniorSeminar{
 				for(int i=0; i<5; i++){ //for each placement in Student object = for each row
 					if(s.isInStaticChoices(sessionList.get(i).get(s.getPlacement(i)).getid())){
 						tempTotalEfficacy++;
+						s.incrementNumTargetSessionsGotten();
 					}
 				}
 			}
@@ -412,7 +413,7 @@ public class SeniorSeminar{
 				System.out.print("\nUser session started, format your response 0-9:\n\n");
 				for(;;){
 					System.out.print("" + //
-					"\t0 - END SESSION\n" + //
+					"\n\t0 - END SESSION\n" + //
 					"\t1 - Find student by ID\n" + //
 					"\t2 - Find student by FULL NAME\n" + //
 					"\t3 - Print roster by Time Slot & Classroom\n" + //
@@ -422,7 +423,7 @@ public class SeniorSeminar{
 					"\t7 - Print full session schedule\n" + //
 					"\t8 - Print sessionsByPopularity\n" + //
 					"\t9 - Sort and print sessions by popularity using Insertion Sort\n\n");
-					switch(getZeroToNum(0, 9)){
+					switch(getNumToNum(0, 9)){
 						case 0:
 							try{
 								System.out.println("\nClosing session...\n");
@@ -432,14 +433,74 @@ public class SeniorSeminar{
 								return;
 							}
 						case 1:
-							System.out.println("Enter a student ID from 1-" + numStudents + ":\n");
-							while(getZeroToNum(1, 74))
+							do{
+							System.out.println("\nEnter a student ID from 1-" + numStudents + ":\n");
+							int idForSearching = getNumToNum(1, 74);
+							Student foundStudent = studentList.get(idForSearching-1);
+							System.out.println();
+							foundStudent.toStringB();
+							ArrayList<Integer> tempPlacements = foundStudent.getPlacements();
+							System.out.println("Placements (classroom index by timeslot): " + foundStudent.getPlacementsOneIndexed());
+							System.out.println("\nPlacements (IDs of placements by timeslot): [" + sessionList.get(0).get(tempPlacements.get(0)).getid() + ", " + sessionList.get(1).get(tempPlacements.get(1)).getid() + ", " + sessionList.get(2).get(tempPlacements.get(2)).getid() + ", " + sessionList.get(3).get(tempPlacements.get(3)).getid() + ", " + sessionList.get(4).get(tempPlacements.get(4)).getid() + "]");
+							System.out.println("\n# of placements in top choices: " + foundStudent.getNumTargetSessionsGotten() + "\n");
+							System.out.println("\nFind another student? (Y/N)\n");
+							} while(getYN());
 							break;
 						case 2:
+						do{
+							Student foundStudent = new Student(-1, "", 0, 0, 0, 0, 0); //i hate that this is necessary, its all bc of scope and java is dumb
+							boolean studentHasBeenFound=false;
+							do{
+							System.out.println("\nEnter a valid student name:\n");
+							String nameForSearching = univScan.nextLine();
+							for(Student s:studentList){
+								if(s.getName().equals(nameForSearching)){
+									foundStudent = s;
+									studentHasBeenFound=true;
+									break;
+								}
+							}
+							} while(!studentHasBeenFound);
+							System.out.println();
+							foundStudent.toStringB();
+							ArrayList<Integer> tempPlacements = foundStudent.getPlacements();
+							System.out.println("Placements (classroom index by timeslot): " + foundStudent.getPlacementsOneIndexed());
+							System.out.println("\nPlacements (IDs of placements by timeslot): [" + sessionList.get(0).get(tempPlacements.get(0)).getid() + ", " + sessionList.get(1).get(tempPlacements.get(1)).getid() + ", " + sessionList.get(2).get(tempPlacements.get(2)).getid() + ", " + sessionList.get(3).get(tempPlacements.get(3)).getid() + ", " + sessionList.get(4).get(tempPlacements.get(4)).getid() + "]");
+							System.out.println("\n# of placements in top choices: " + foundStudent.getNumTargetSessionsGotten() + "\n");
+							System.out.println("\nFind another student? (Y/N)\n");
+							} while(getYN());						
 							break;
 						case 3:
+							do{
+								System.out.println("\nEnter time slot (1-" + numTimeSlots + "):\n");
+								int timeSlotForSearching = getNumToNum(1, numTimeSlots);
+								System.out.println("\nEnter classroom # (1-" + numClassrooms + "):\n");
+								int classroomNumForSearching = getNumToNum(1, numClassrooms);
+								Session sessionFound = sessionList.get(timeSlotForSearching-1).get(classroomNumForSearching-1);
+								System.out.println("\n\nTime Slot: " + timeSlotForSearching + ", Classroom #: " + classroomNumForSearching + ", Session ID & specIndex: " + sessionFound.getid()+"-"+sessionFound.getSpecIndex() + ", # of students: " + sessionFound.getNumStudents());
+								System.out.println("\nRoster by student ID: " + sessionFound.getRoster());
+								System.out.println("\nRoster by student name: " + sessionFound.getRosterByStudentName());
+								System.out.println("\n\nPrint roster for another session? (Y/N)\n");
+							} while(getYN());
 							break;
 						case 4:
+							do{
+								System.out.println("\nEnter session ID (1-" + numSessions + "):\n");
+								int idForSearching = getNumToNum(1, numSessions);
+								System.out.println("\n\nPresenter name: " + presenterList.get(idForSearching-1).getName());
+								System.out.println("\nPresentation name: " + presenterList.get(idForSearching-1).getNameOfPresentation());
+								for(int a=0; a<numTimeSlots; a++){
+									for(int b=0; b<numClassrooms; b++){
+										if(sessionList.get(a).get(b).getid()==idForSearching){
+											Session sessionFound = sessionList.get(a).get(b);
+											System.out.println("\n\nTime Slot: " + (a+1) + ", Classroom #: " + (b+1) + ", Session ID & specIndex: " + sessionFound.getid()+"-"+sessionFound.getSpecIndex() + ", # of students: " + sessionFound.getNumStudents());
+											System.out.println("\nRoster by student ID: " + sessionFound.getRoster());
+											System.out.println("\nRoster by student name: " + sessionFound.getRosterByStudentName());
+										}
+									}
+								}
+								System.out.println("\nPrint roster for another session ID? (Y/N)\n");
+							} while(getYN());
 							break;
 						case 5:
 							break;
@@ -497,13 +558,17 @@ public class SeniorSeminar{
 				int templen = response.length();
 				boolean tempgood=true;
 				for(int i=0;i<templen; i++){
-					if(!(response.charAt(i)<=(48+n)&&response.charAt(i)>=(48+z))){
+					if(!(response.charAt(i)<=(57)&&response.charAt(i)>=(48))){
 						tempgood=false;
 					}
 				}
 				if(tempgood){
 					temp = Integer.parseInt(response);
-					break; //pick up here finish method
+					if(temp>=z&&temp<=n){
+						break;
+					} else {
+						System.out.println("\nPlease format your response (" + z + "-" + n + "):\n");
+					}
 				} else {
 					System.out.println("\nPlease format your response (" + z + "-" + n + "):\n");
 				}

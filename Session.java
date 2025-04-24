@@ -2,9 +2,11 @@ import java.util.ArrayList;
 public class Session{
 	int sessionID, specIndex, presenterID, timeSlot, classroomNum, numStudents;
 	ArrayList<Integer> studentsIn;
+	ArrayList<String> studentsInByName;
 	public Session(){
 		numStudents=0;
 		studentsIn = new ArrayList<>();
+		studentsInByName = new ArrayList<>();
 		sessionID=-1;
 		specIndex=-1;
 		//presenterID=-1;
@@ -14,6 +16,7 @@ public class Session{
 	public Session(int sessionID, int specIndex){
 		numStudents=0;
 		studentsIn = new ArrayList<>();
+		studentsInByName = new ArrayList<>();
 		this.sessionID=sessionID;
 		this.specIndex=specIndex;
 		//code to figure out and assign the presenter id soon
@@ -24,6 +27,7 @@ public class Session{
 	public Session(int sessionID, int specIndex, int timeSlot, int classroomNum){
 		numStudents=0;
 		studentsIn = new ArrayList<>();
+		studentsInByName = new ArrayList<>();
 		this.sessionID=sessionID;
 		this.specIndex=specIndex;
 		this.timeSlot=timeSlot;
@@ -42,9 +46,13 @@ public class Session{
 	public void addStudent(Student s){
 		studentsIn.add(s.getid());
 		numStudents = studentsIn.size();
+		studentsInByName.add(s.getName());
 	}
 	public int getNumStudents(){return numStudents;}
 	public ArrayList<Integer> getRoster(){
 		return studentsIn;
+	}
+	public ArrayList<String> getRosterByStudentName(){
+		return studentsInByName;
 	}
 }

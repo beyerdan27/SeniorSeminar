@@ -3,10 +3,12 @@ public class Student{
 	ArrayList<Integer> choices;
 	ArrayList<Integer> staticChoices;
 	ArrayList<Integer> placements;
+	int ntsg;
 	String name;
 	boolean hasChosen;
 	int id, maxOverlapPotential;
 	public Student(int id, String name, int choice1, int choice2, int choice3, int choice4, int choice5){
+		ntsg=0;
 		choices = new ArrayList<>();
 		placements = new ArrayList<>(5);
 		for(int i=0; i<5; i++){placements.add(-1);} //filling with -1s so i am not bombarded by java.lang.IndexOutOfBoundsException
@@ -27,6 +29,9 @@ public class Student{
 	public void toStringA(){
 		System.out.println(id+" "+hasChosen + " " + name + " " + choices.get(0) + " " + choices.get(1) + " " + choices.get(2) + " " + choices.get(3) + " " + choices.get(4));
 	}
+	public void toStringB(){
+		System.out.println("\nID: " + id+", hasChosen="+hasChosen + ", Name: " + name + ", Choices: " + staticChoices.get(0) + ", " + staticChoices.get(1) + ", " + staticChoices.get(2) + ", " + staticChoices.get(3) + ", " + staticChoices.get(4) + "\n");		
+	}
 	public int getch(int num){
 		return choices.get(num-1);
 	}
@@ -42,10 +47,18 @@ public class Student{
 	public int getPlacement(int timeSlot){ //0-indexed as well
 		return placements.get(timeSlot);
 	}
+	public ArrayList<Integer> getPlacementsOneIndexed(){
+		ArrayList<Integer> result = new ArrayList<>();
+		for(Integer i: placements){
+			result.add(i+1);
+		}
+		return result;
+	}
 	public void removeChoice(int id){ //dumb that this is needed, only call after user control
 		int tempIndex = choices.indexOf(id);
 		if(tempIndex!=-1) choices.set(tempIndex, -1);
 	}
+	public String getName(){return name;}
 	public boolean isInStaticChoices(int id){
 		for(int i=0; i<5; i++){
 			if(staticChoices.indexOf(id)!=-1) return true;
@@ -53,4 +66,9 @@ public class Student{
 		return false;
 	}
 	public ArrayList<Integer> getStaticChoices(){return staticChoices;}
+	public void setNumTargetSessionsGotten(int n){
+		ntsg=n;
+	}
+	public void incrementNumTargetSessionsGotten(){ntsg++;}
+	public int getNumTargetSessionsGotten(){return ntsg;}
 }
