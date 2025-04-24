@@ -503,14 +503,49 @@ public class SeniorSeminar{
 							} while(getYN());
 							break;
 						case 5:
+							System.out.println("\nOverlap by sessions:\n");
+							for(int i=0; i<numSessions; i++){System.out.print("\t #" + (i+1));}
+							System.out.println();
+							for(int a=0; a<numSessions; a++){
+								System.out.println();
+								for(int b=0; b<numSessions; b++){
+									if(b==0) System.out.print("#" + (a+1) + "  ");
+									System.out.print("\t " + overlapTable.get(a).get(b));
+								}
+							}
+							System.out.println();
 							break;
 						case 6:
+							System.out.println();
+							int counter=1;
+							for(Presenter p:presenterList){
+								System.out.println("ID: " + counter + ", Name: " + p.getName() + ", Presentation: " + p.getNameOfPresentation());
+								counter++;
+							}
+							System.out.println();
 							break;
 						case 7:
+							System.out.println("\nSession schedule (row = timeslot, column = classroom):");
+							for(int a=0; a<5; a++){
+								System.out.println("\n");
+								for(int b=0; b<5; b++){
+									System.out.print("\t" + sessionList.get(a).get(b).getid()+"-" + sessionList.get(a).get(b).getSpecIndex()+" ");
+								}
+							}
+							System.out.println("\n");
 							break;
 						case 8:
+							System.out.println("\nPopularity by session: \n");
+							int temppp=0;
+							for(int i:popularityBySession){
+								temppp++; //temporary promise
+								System.out.println("Session " + temppp + " popularity: " + i);
+							}
+							System.out.println();
 							break;
 						case 9:
+							System.out.println("\nSession popularities in increasing order: \n");
+							sortAndPrintPopularity();
 							break;
 					}
 				}
