@@ -48,6 +48,18 @@ public class Session{
 		numStudents = studentsIn.size();
 		studentsInByName.add(s.getName());
 	}
+	public void removeStudent(Student s){
+		int tempid = s.getid();
+		int tempsize = studentsIn.size();
+		for(int i=0; i<tempsize; i++){
+			if(studentsIn.get(i)==tempid){
+				studentsIn.remove(i);
+				studentsInByName.remove(i);
+				tempsize = studentsIn.size();
+				numStudents--;
+			}
+		}
+	}
 	public int getNumStudents(){return numStudents;}
 	public ArrayList<Integer> getRoster(){
 		return studentsIn;

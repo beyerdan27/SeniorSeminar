@@ -351,11 +351,20 @@ public class SeniorSeminar{
 			}
 		}
 	}
+	public void scheduleStudent2(Student s){ //better than scheduleStudent
+		//logic:
+		//for each row:
+		//
+	}
 	public boolean isInChoices(Student s, int id){
 		for(int k=1; k<6; k++){
 			if(s.getch(k)==id) return true;
 		}
 		return false;
+	}
+	public void moveStudent(Student s, int timeslot, int classroom){
+		s.addPlacement(timeslot, classroom);
+		
 	}
 	public boolean isFull(Session s){
 		return (s.getNumStudents()>=maxInClass);
@@ -411,6 +420,9 @@ public class SeniorSeminar{
 					System.out.println("}\n\nSessions filled; Average efficacy: " + averageEfficacy);
 				}catch(InterruptedException e){}
 				System.out.print("\nUser session started, format your response 0-9:\n\n");
+				//TESTING CODE ZONE:
+
+				//END TESTING CODE ZONE
 				for(;;){
 					System.out.print("" + //
 					"\n\t0 - END SESSION\n" + //
@@ -421,7 +433,7 @@ public class SeniorSeminar{
 					"\t5 - Print full overlap table of sessions by student choice\n" + //
 					"\t6 - Print full presenter roster\n" + //
 					"\t7 - Print full session schedule\n" + //
-					"\t8 - Print sessionsByPopularity\n" + //
+					"\t8 - Print popularity by session\n" + //
 					"\t9 - Sort and print sessions by popularity using Insertion Sort\n\n");
 					switch(getNumToNum(0, 9)){
 						case 0:
@@ -544,7 +556,7 @@ public class SeniorSeminar{
 							System.out.println();
 							break;
 						case 9:
-							System.out.println("\nSession popularities in increasing order: \n");
+							System.out.println("\nSession popularities in increasing order: ");
 							sortAndPrintPopularity();
 							break;
 					}
