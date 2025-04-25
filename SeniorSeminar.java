@@ -361,7 +361,7 @@ public class SeniorSeminar{
 			}
 		}
 	}
-	public void secondPass(){//call after evaluate efficacy, which recalls it THIS METHOD IS SO BROKEN
+	public void secondPass(){//THIS IS SO BROKEN AND TERRIBLE also use secoindPass2, never run this
 		ArrayList<Student> poorStudents = new ArrayList<>();
 		for(Student s:studentList){
 			if(s.getNumTargetSessionsGotten()<=3&&s.isChosen()) poorStudents.add(s);
@@ -379,7 +379,7 @@ public class SeniorSeminar{
 						movePoorStudentToNextAvailable(s, c);
 						for(int d=0; d<numClassrooms; d++){
 							movePoorStudentToNextAvailable(s, d);
-							for(int e=0; e<numClassrooms; e++){ //O(n^n), could be worse, also this cannot scale, whoopsies
+							for(int e=0; e<numClassrooms; e++){ //O(n^n), could be worse, also this cannot scale
 								movePoorStudentToNextAvailable(s, e);
 								for(int j=0; j<5; j++){ //for each placement in Student object = for each row
 									if(s.isInStaticChoices(sessionList.get(j).get(s.getPlacement(j)).getid())){
@@ -395,7 +395,35 @@ public class SeniorSeminar{
 		}
 		evaluateEfficacy();
 	}
+	public void secondPass2(){
+		ArrayList<Student> poorStudents = new ArrayList<>();
+		for(Student s:studentList){
+			if(s.getNumTargetSessionsGotten()<=3&&s.isChosen()) poorStudents.add(s);
+		}
+		for(Student s:poorStudents){
+			for(int t=0; t<numTimeSlots; t++){
+				if(!isStudentInIdeal(s, t)){
+					if(!moveStudentToNextAvailableIDEAL(s, t, false)){/*
+						for(int i=0; i<numClassrooms; i++){
+							if(idsOfPermissableDoubles.indexOf(sessionList.get(t).get(i).getid())!=-1){
+								if(hasDoubleAbove(sessionList.get(t).get(i), t)[0]!=-1){
+									int[] indexTuple = hasDoubleAbove(sessionList.get(t).get(i), t);
+									if(isInChoices(s, sessionList.get(indexTuple[0]).get(indexTuple[1]).getid())){
 
+									}
+								} else {
+									System.out.print("-");
+								}
+							}
+						}*/
+					} else {
+						//System.out.print("-");
+					}
+				}
+			}
+			//System.out.println();
+		}
+	}
 	public boolean isInChoices(Student s, int id){
 		for(int k=1; k<6; k++){
 			if(s.getch(k)==id) return true;
@@ -552,8 +580,11 @@ public class SeniorSeminar{
 			if(getYN()){
 				fillTimeSlots();
 				fillSessions();
+				secondPass2();
+				//secondPass3();//doesn't improve efficacy
 				evaluateEfficacy();
 				//secondPass();
+				//secondPass2();
 				try{
 					System.out.print("\n{");
 					for(int i=0;i<13;i++){
