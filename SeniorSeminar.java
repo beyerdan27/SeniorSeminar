@@ -257,7 +257,7 @@ public class SeniorSeminar{
 	public void fillSessions(){
 		//copy studentlist, nvm don't really need to
 		//ArrayList<Student> modifiableStudents = new ArrayList<Student>(studentList);
-		ArrayList<Student> studentsByPriority = new ArrayList<Student>();
+		ArrayList<Student> studentsByPriority = new ArrayList<>();
 		ArrayList<Integer> conflictsByStudent = new ArrayList<>();
 		//calculate max overlap potential of any student on the list
 		//max it. remove that person, add to studentsbypriority
@@ -292,7 +292,7 @@ public class SeniorSeminar{
 			conflictsByStudent.set(maxConflictsIndex, -2);
 		} //now that i think about it, SBP is probably unnecessary memory - could just schedule in the above loop
 		//looping through students by priority, scheduling index 0, removing index 0
-		for(Student s:studentsByPriority){scheduleStudent(s);} //scheduling every student
+		for(Student s:studentsByPriority){scheduleStudent2(s);} //scheduling every student
 		//System.out.println("\n" + studentList.get(61).getPlacements()); //15, 1, 7, 9, 2
 		//System.out.println(sessionList.get(0).get(0).getRoster());
 	}
@@ -347,30 +347,172 @@ public class SeniorSeminar{
 				//actually scheduling the session below
 				sessionList.get(row).get(minPopIndex2).addStudent(s); //adding student to session roster
 				s.addPlacement(row, sessionList.get(row).get(minPopIndex2).getClassroomNum()); //adding placement to students arraylist
-				s.removeChoice(sessionList.get(row).get(minPopIndex2).getid());				
+				//s.removeChoice(sessionList.get(row).get(minPopIndex2).getid());//not needed				
 			}
 		}
 	}
 	public void scheduleStudent2(Student s){ //better than scheduleStudent
-		//logic:
-		//for each row:
-		//
+		//look how nicely modular this method is
+		for(int i=0; i<numTimeSlots; i++){
+			if(!moveStudentToNextAvailableIDEAL(s, i, false)){
+				if(!moveStudentToNextAvailable(s, i)){
+					System.out.println("wtf");
+				}
+			}
+		}
 	}
+	public void secondPass(){//call after evaluate efficacy, which recalls it THIS METHOD IS SO BROKEN
+		ArrayList<Student> poorStudents = new ArrayList<>();
+		for(Student s:studentList){
+			if(s.getNumTargetSessionsGotten()<=3&&s.isChosen()) poorStudents.add(s);
+		}
+		//jumbling around the students until we find an optimal schedule
+		for(Student s:poorStudents){
+			int tempMax = s.getNumTargetSessionsGotten();
+			s.setNumTargetSessionsGotten(0);
+			outerLoop:
+			for(int a=0; a<numClassrooms; a++){
+				movePoorStudentToNextAvailable(s, a);
+				for(int b=0; b<numClassrooms; b++){
+					movePoorStudentToNextAvailable(s, b);
+					for(int c=0; c<numClassrooms; c++){
+						movePoorStudentToNextAvailable(s, c);
+						for(int d=0; d<numClassrooms; d++){
+							movePoorStudentToNextAvailable(s, d);
+							for(int e=0; e<numClassrooms; e++){ //O(n^n), could be worse, also this cannot scale, whoopsies
+								movePoorStudentToNextAvailable(s, e);
+								for(int j=0; j<5; j++){ //for each placement in Student object = for each row
+									if(s.isInStaticChoices(sessionList.get(j).get(s.getPlacement(j)).getid())){
+										s.incrementNumTargetSessionsGotten();
+									}
+								}
+								if(s.getNumTargetSessionsGotten()>=tempMax) break outerLoop;
+							}
+						}
+					}
+				}
+			}
+		}
+		evaluateEfficacy();
+	}
+
 	public boolean isInChoices(Student s, int id){
 		for(int k=1; k<6; k++){
 			if(s.getch(k)==id) return true;
 		}
 		return false;
 	}
-	public void moveStudent(Student s, int timeslot, int classroom){
-		s.addPlacement(timeslot, classroom);
-		
+	public void moveStudent(Student s, int timeslot, int classroom){ //0-indexed
+		if(s.getPlacement(timeslot)!=-1){
+			sessionList.get(timeslot).get(s.getPlacement(timeslot)).removeStudent(s);//removing student on session end
+		}
+		s.addPlacement(timeslot, classroom, sessionList.get(timeslot).get(classroom).getid()); //this replaces the session as well
+		sessionList.get(timeslot).get(classroom).addStudent(s);
+	}
+	public boolean moveStudentToNextAvailable(Student s, int timeslot){ //should always return true
+		int currentIndex = s.getPlacement(timeslot);
+		for(int i=0; i<numClassrooms; i++){
+			if(i==currentIndex) continue;
+			if(!isFull(sessionList.get(timeslot).get(i))){
+				if(!s.idIsAlreadyScheduled(sessionList.get(timeslot).get(i).getid())){
+					moveStudent(s, timeslot, i);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	public boolean movePoorStudentToNextAvailable(Student s, int timeslot){
+		int currentIndex = s.getPlacement(timeslot);
+		for(int i=0; i<numClassrooms; i++){
+			if(i==currentIndex) continue;
+			if(!isFull(sessionList.get(timeslot).get(i))){
+				if(!s.idIsAlreadyScheduledAbove(sessionList.get(timeslot).get(i).getid(), timeslot)){
+					moveStudent(s, timeslot, i);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	public boolean moveStudentToNextAvailableIDEAL(Student s, int timeslot, boolean callingFromBelow){ //returns whether student was able to get a top5 or not, also recursive
+		int currentIndex = s.getPlacement(timeslot);
+		for(int i=0; i<numClassrooms; i++){
+			if(i==currentIndex) continue;
+			if(!s.idIsAlreadyScheduled(sessionList.get(timeslot).get(i).getid())){ //if it hasnt already been scheduled
+				if(s.isInStaticChoices(sessionList.get(timeslot).get(i).getid())){ //if student even wants the session
+					if(!isFull(sessionList.get(timeslot).get(i))){ //if session isnt full
+							moveStudent(s, timeslot, i);
+							return true;
+					} else {
+						//loop through every already scheduled student, see which are movable, move one to make room if so
+						ArrayList<Integer> tempScheds = sessionList.get(timeslot).get(i).getRoster(); //1-indexed, subtract 1 when accessing studentList
+						for(Integer id:tempScheds){
+							if(!isStudentInIdeal(studentList.get(id-1), timeslot)){ //assumes that, because student is scheduled un-ideally, we can re-schedule them un-ideally
+								if(moveStudentToNextAvailable(studentList.get(id-1), timeslot)){
+									moveStudent(s, timeslot, i);
+									return true;
+								}
+								return false;//this fallback shouldnt be necessary but i'm still scared
+							} else if(moveStudentToNextAvailableIDEAL(studentList.get(id-1), timeslot, false)){ //RECURSION? O_o (seeing if, even though student is ideally scheduled, they can move to another session)
+								moveStudent(s, timeslot, i);
+								return true;
+							} else {
+								//womp, can't do anything
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	public boolean isStudentInIdeal(Student s, int timeslot){
+		int currentIndex = s.getPlacement(timeslot);
+		return s.isInStaticChoices(sessionList.get(timeslot).get(currentIndex).getid());
 	}
 	public boolean isFull(Session s){
 		return (s.getNumStudents()>=maxInClass);
 	}
 	public boolean isFull(int row, int col){ //overloaded & 0-indexed as well
 		return (sessionList.get(row).get(col).getNumStudents()>=maxInClass);
+	}
+	public int[] hasDoubleAbove(Session s, int timeslot){
+		for(int i=0; i<timeslot; i++){
+			for(int a=0; a<numClassrooms; a++){
+				if(sessionList.get(i).get(a).getid()==s.getid()){
+					int[] result = {i, a};
+					return result;
+				}
+			}
+		}
+		int[] result = {-1};
+		return result;
+	}
+	public boolean hasDoubleBelow(Session s, int timeslot){
+		for(int i=timeslot+1; i<numTimeSlots; i++){
+			for(int a=0; a<numClassrooms; a++){
+				if(sessionList.get(i).get(a).getid()==s.getid()){
+					//int[] result = {i, a};
+					return true;
+				}
+			}
+		}
+		//int[] result = {-1};
+		return false;
+	}
+	public int[] getDoubleBelow(Session s, int timeslot){ //used after using above method to conform it wont break, but it still has a fallback
+		for(int i=timeslot+1; i<numTimeSlots; i++){
+			for(int a=0; a<numClassrooms; a++){
+				if(sessionList.get(i).get(a).getid()==s.getid()){
+					int[] result = {i, a};
+					return result;
+				}
+			}
+		}
+		int[] result = {-1};
+		return result;
 	}
 	public void evaluateEfficacy(){
 		double tempTotalEfficacy = 0.0; //double for the division in the print statement
@@ -411,6 +553,7 @@ public class SeniorSeminar{
 				fillTimeSlots();
 				fillSessions();
 				evaluateEfficacy();
+				//secondPass();
 				try{
 					System.out.print("\n{");
 					for(int i=0;i<13;i++){

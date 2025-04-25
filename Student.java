@@ -3,15 +3,18 @@ public class Student{
 	ArrayList<Integer> choices;
 	ArrayList<Integer> staticChoices;
 	ArrayList<Integer> placements;
+	ArrayList<Integer> placementsByID;
 	int ntsg;
 	String name;
 	boolean hasChosen;
 	int id, maxOverlapPotential;
 	public Student(int id, String name, int choice1, int choice2, int choice3, int choice4, int choice5){
+		placementsByID = new ArrayList<>();
 		ntsg=0;
 		choices = new ArrayList<>();
 		placements = new ArrayList<>(5);
 		for(int i=0; i<5; i++){placements.add(-1);} //filling with -1s so i am not bombarded by java.lang.IndexOutOfBoundsException
+		for(int i=0; i<5; i++){placementsByID.add(-1);} 
 		this.id = id;
 		this.name = name;
 		if(choice1==choice2 && ((choice2==choice3 && choice3==choice4) && (choice4==choice5 && choice5==0))){
@@ -43,6 +46,10 @@ public class Student{
 	public void addPlacement(int timeSlot, int classroomNum){ //timeslot is 0-indexed, yes that means the nomenclature is messed up
 		placements.set(timeSlot, classroomNum);
 	}
+	public void addPlacement(int timeSlot, int classroomNum, int sessionID){
+		placements.set(timeSlot, classroomNum);
+		placementsByID.set(timeSlot, sessionID);
+	}
 	public ArrayList<Integer> getPlacements(){return placements;}
 	public int getPlacement(int timeSlot){ //0-indexed as well
 		return placements.get(timeSlot);
@@ -71,4 +78,15 @@ public class Student{
 	}
 	public void incrementNumTargetSessionsGotten(){ntsg++;}
 	public int getNumTargetSessionsGotten(){return ntsg;}
+	public boolean idIsAlreadyScheduled(int id){
+		return (placementsByID.indexOf(id)!=-1);
+	}
+	public boolean idIsAlreadyScheduledAbove(int id, int timeslot){
+		if(placementsByID.indexOf(id)==-1||placementsByID.indexOf(id)>timeslot) return false;
+		return true;
+	}
+	public void clearPlacements(){
+		for(int i=0; i<5; i++){placements.set(i, -1);} 
+		for(int i=0; i<5; i++){placementsByID.set(i, -1);} 
+	}
 }
