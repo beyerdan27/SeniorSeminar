@@ -1,6 +1,6 @@
 public class Tester{
 	public static void main(String[] args){
-		SeniorSeminar temp = new SeniorSeminar(5, 5, 16); //for some reason any class size beyond 29 yields the same efficacy...
+		SeniorSeminar temp = new SeniorSeminar(5, 5, 16); 
 		//temp.aggregateData();
 		//temp.fillTimeSlots();
 		//temp.fillSessions();

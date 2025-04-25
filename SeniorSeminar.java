@@ -142,7 +142,7 @@ public class SeniorSeminar{
 			numScheduledPerSession.add(0); //helpful bc have to use .set method, .add would definitely break future code
 		}//filling nsps with 0s to help with the following block of code
 
-		//counting how many students have NOT chosen
+		//counting how many students have NOT chosen (used when evaluating efficacy bc those students are not counted)
 		for(Student s:studentList){
 			if(!s.isChosen()) numStudentsWhoHaveNotChosen++;
 		}
@@ -356,12 +356,12 @@ public class SeniorSeminar{
 		for(int i=0; i<numTimeSlots; i++){
 			if(!moveStudentToNextAvailableIDEAL(s, i, false)){
 				if(!moveStudentToNextAvailable(s, i)){
-					System.out.println("wtf");
+					System.out.println("wtf"); //this should never run, MSTNA always finds a session to schedule
 				}
 			}
 		}
 	}
-	public void secondPass(){//THIS IS SO BROKEN AND TERRIBLE also use secoindPass2, never run this
+	public void secondPass(){//THIS IS A DEPRECATED ATTEMPT AT A SECOND PASS by brute force, didn't work
 		ArrayList<Student> poorStudents = new ArrayList<>();
 		for(Student s:studentList){
 			if(s.getNumTargetSessionsGotten()<=3&&s.isChosen()) poorStudents.add(s);
@@ -395,7 +395,8 @@ public class SeniorSeminar{
 		}
 		evaluateEfficacy();
 	}
-	public void secondPass2(){
+	public void secondPass2(){//second pass by simply rescheduling in the un-optimal rows
+		//there is still room for improvement - edge case where ideal session isn't full in a row, but there is an above double that we scheduled, instead of a non-double
 		ArrayList<Student> poorStudents = new ArrayList<>();
 		for(Student s:studentList){
 			if(s.getNumTargetSessionsGotten()<=3&&s.isChosen()) poorStudents.add(s);
@@ -403,7 +404,7 @@ public class SeniorSeminar{
 		for(Student s:poorStudents){
 			for(int t=0; t<numTimeSlots; t++){
 				if(!isStudentInIdeal(s, t)){
-					if(!moveStudentToNextAvailableIDEAL(s, t, false)){/*
+					if(!moveStudentToNextAvailableIDEAL(s, t, true)){/*
 						for(int i=0; i<numClassrooms; i++){
 							if(idsOfPermissableDoubles.indexOf(sessionList.get(t).get(i).getid())!=-1){
 								if(hasDoubleAbove(sessionList.get(t).get(i), t)[0]!=-1){
@@ -463,15 +464,17 @@ public class SeniorSeminar{
 		}
 		return false;
 	}
-	public boolean moveStudentToNextAvailableIDEAL(Student s, int timeslot, boolean callingFromBelow){ //returns whether student was able to get a top5 or not, also recursive
+	public boolean moveStudentToNextAvailableIDEAL(Student s, int timeslot, boolean secondpass){ //returns whether student was able to get a top5 or not, also recursive
 		int currentIndex = s.getPlacement(timeslot);
 		for(int i=0; i<numClassrooms; i++){
 			if(i==currentIndex) continue;
 			if(!s.idIsAlreadyScheduled(sessionList.get(timeslot).get(i).getid())){ //if it hasnt already been scheduled
 				if(s.isInStaticChoices(sessionList.get(timeslot).get(i).getid())){ //if student even wants the session
 					if(!isFull(sessionList.get(timeslot).get(i))){ //if session isnt full
+						//if(secondpass||idsOfPermissableDoubles.indexOf(sessionList.get(timeslot).get(i).getid())==-1){
 							moveStudent(s, timeslot, i);
 							return true;
+						//}
 					} else {
 						//loop through every already scheduled student, see which are movable, move one to make room if so
 						ArrayList<Integer> tempScheds = sessionList.get(timeslot).get(i).getRoster(); //1-indexed, subtract 1 when accessing studentList
